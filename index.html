@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Rantai Makanan - Ekosistem Sawah</title>
+    <style>
+        /* ==========================================================================
+           1. CORE STYLES & NO-SCROLL LAYOUT (100VH FIT)
+           ========================================================================== */
+        :root {
+            --padi-green: #7BC043;
+            --padi-dark: #4C9A2A;
+            --gold-light: #FFC93C;
+            --gold-dark: #F5A800;
+            --sky-top: #7EC8F2;
+            --sky-bottom: #3FA7E0;
+            --bg-soft: #FFFBEA;
+            --text-dark: #2B3A1F;
+            --danger: #FF4757;
+            --wood-border: #6E4720;
+            --card-shadow: 0 6px 0px rgba(0,0,0,0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden !important;
+            font-family: 'Fredoka', 'Chalkboard SE', 'Comic Sans MS', 'Inter', sans-serif;
+            background-color: #1A2810;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-wrapper {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            position: relative;
+            background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 45%, var(--padi-green) 45%, #2D5A18 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* ==========================================================================
+           2. SVG ANIMATED SCENERY (BACKGROUND SAWAH)
+           ========================================================================== */
+        .sky-scene {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            width: 100%;
+            height: 45%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .cloud {
+            fill: #FFFFFF;
+            opacity: 0.9;
+            animation: floatClouds 35s linear infinite;
+        }
+
+        @keyframes floatClouds {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(1400px); }
+        }
+
+        .sun-glow {
+            position: absolute;
+            top: 2vh;
+            right: 4vw;
+            width: clamp(55px, 7.5vh, 90px);
+            height: clamp(55px, 7.5vh, 90px);
+            background: radial-gradient(circle, #FFE600 40%, #FF9900 85%, rgba(255,153,0,0) 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 25px #FFE600;
+            animation: pulseSun 3s ease-in-out infinite alternate;
+            z-index: 2;
+        }
+
+        @keyframes pulseSun {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+
+        .sawah-landscape {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            width: 100%;
+            height: 55%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .rice-stalk {
+            transform-origin: bottom center;
+            animation: swayRice 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes swayRice {
+            0% { transform: rotate(-3deg); }
+            100% { transform: rotate(4deg); }
+        }
+
+        /* ==========================================================================
+           3. TOP NAVIGATION HUD
+           ========================================================================== */
+        .top-bar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2vw;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 4px solid var(--padi-dark);
+            height: clamp(48px, 7.5vh, 65px);
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .app-title-sm {
+            font-size: clamp(18px, 2.5vh, 26px);
+            font-weight: 900;
+            color: var(--padi-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ==========================================================================
+           4. COMPACT & HIGH CONTRAST BUTTONS
+           ========================================================================== */
+        .btn {
+            font-size: clamp(15px, 2vh, 22px);
+            font-weight: 900;
+            padding: clamp(6px, 1vh, 12px) clamp(14px, 1.8vw, 26px);
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.25);
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0px rgba(0,0,0,0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #FFDC69 0%, var(--gold-dark) 100%);
+            color: #4A2800;
+            border: 3px solid #D68D00;
+        }
+
+        .btn-success {
+            background: linear-gradient(to bottom, #8CE64A 0%, var(--padi-dark) 100%);
+            color: #FFFFFF;
+            border: 3px solid #2D5A18;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .btn-icon {
+            padding: clamp(5px, 0.8vh, 8px) clamp(10px, 1.2vw, 16px);
+            font-size: clamp(14px, 1.8vh, 18px);
+            background: #FFFFFF;
+            border: 2px solid #CBD5E0;
+            color: var(--text-dark);
+        }
+
+        /* ==========================================================================
+           5. MAIN CONTAINERS & SCREENS
+           ========================================================================== */
+        .screen-container {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: clamp(6px, 1.2vh, 16px) clamp(12px, 2vw, 32px);
+            overflow: hidden !important;
+            max-height: calc(100vh - clamp(48px, 7.5vh, 65px));
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            animation: zoomIn 0.25s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .wood-board {
+            background: rgba(255, 251, 234, 0.97);
+            border-radius: clamp(18px, 2.8vh, 32px);
+            padding: clamp(14px, 2.2vh, 28px) clamp(16px, 3vw, 40px);
+            text-align: center;
+            max-width: 900px;
+            width: 95%;
+            max-height: 88vh;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            border: clamp(4px, 0.8vh, 7px) solid var(--wood-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ==========================================================================
+           6. SCREEN SPECIFIC STYLES
+           ========================================================================== */
+        /* Welcome */
+        .main-title {
+            font-size: clamp(26px, 4.5vh, 48px);
+            font-weight: 900;
+            color: var(--padi-dark);
+            text-shadow: 2px 2px 0px #FFF, 3px 3px 0px var(--gold-dark);
+            margin-bottom: 1.5vh;
+        }
+
+        .story-box {
+            font-size: clamp(15px, 2.3vh, 24px);
+            line-height: 1.4;
+            color: #2D3748;
+            margin-bottom: 2.5vh;
+            background: #FFFBE6;
+            padding: clamp(10px, 1.8vh, 20px);
+            border-radius: 18px;
+            border: 3px dashed var(--gold-dark);
+        }
+
+        /* How to Play */
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(8px, 1.5vw, 20px);
+            margin: 1.5vh 0;
+            width: 100%;
+        }
+
+        .step-card {
+            background: #FFFFFF;
+            padding: clamp(10px, 1.6vh, 18px);
+            border-radius: 20px;
+            border: 3px solid var(--sky-top);
+            text-align: center;
+        }
+
+        .step-icon {
+            font-size: clamp(32px, 5vh, 50px);
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        .step-title {
+            font-size: clamp(16px, 2.2vh, 22px);
+            font-weight: 900;
+            color: var(--sky-bottom);
+            margin-bottom: 2px;
+        }
+
+        .step-desc {
+            font-size: clamp(13px, 1.8vh, 17px);
+            color: #4A5568;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        /* Team Selection */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(10px, 1.5vw, 24px);
+            width: 100%;
+            max-width: 1050px;
+            margin-top: 1.5vh;
+        }
+
+        .team-card {
+            background: #FFFFFF;
+            border-radius: clamp(16px, 2.5vh, 28px);
+            padding: clamp(12px, 2vh, 22px) clamp(8px, 1vw, 16px);
+            text-align: center;
+            border: 4px solid #CBD5E0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .team-card:hover {
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        .team-card.pipit { border-color: var(--padi-green); background: linear-gradient(to bottom, #FFF 60%, #F0FDF4 100%); }
+        .team-card.laba { border-color: var(--gold-dark); background: linear-gradient(to bottom, #FFF 60%, #FFFBEB 100%); }
+        .team-card.elang { border-color: #E53E3E; background: linear-gradient(to bottom, #FFF 60%, #FFF5F5 100%); }
+
+        .team-emoji {
+            font-size: clamp(42px, 7.5vh, 70px);
+            margin: 4px 0;
+        }
+
+        .team-name {
+            font-size: clamp(20px, 3vh, 28px);
+            font-weight: 900;
+        }
+
+        .level-badge {
+            font-size: clamp(12px, 1.6vh, 16px);
+            font-weight: 800;
+            padding: 3px 12px;
+            border-radius: 50px;
+            background: #EDF2F7;
+            color: #4A5568;
+            margin: 4px 0 8px 0;
+        }
+
+        .completion-badge {
+            position: absolute;
+            top: -10px; right: -10px;
+            background: #48BB78;
+            color: #FFF;
+            width: clamp(30px, 4vh, 40px);
+            height: clamp(30px, 4vh, 40px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(18px, 2.5vh, 24px);
+            border: 3px solid #FFF;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .stars-summary {
+            font-size: clamp(15px, 2vh, 20px);
+            color: var(--gold-dark);
+            font-weight: 900;
+        }
+
+        /* ==========================================================================
+           7. GAMEPLAY HUD & CARDS
+           ========================================================================== */
+        .game-header {
+            width: 100%;
+            max-width: 1050px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: clamp(6px, 1vh, 10px) clamp(12px, 1.5vw, 20px);
+            border-radius: 18px;
+            margin-bottom: 1vh;
+            border: 3px solid var(--padi-green);
+            flex-shrink: 0;
+        }
+
+        .mission-title {
+            font-size: clamp(16px, 2.2vh, 24px);
+            font-weight: 900;
+            color: var(--padi-dark);
+        }
+
+        .mission-progress {
+            display: flex;
+            gap: 6px;
+        }
+
+        .progress-dot {
+            width: clamp(12px, 1.8vh, 18px);
+            height: clamp(12px, 1.8vh, 18px);
+            border-radius: 50%;
+            background: #E2E8F0;
+            border: 2px solid #CBD5E0;
+        }
+
+        .progress-dot.active {
+            background: var(--gold-light);
+            border-color: var(--gold-dark);
+            transform: scale(1.15);
+        }
+
+        .progress-dot.done {
+            background: var(--padi-green);
+            border-color: var(--padi-dark);
+        }
+
+        /* Cards & Slots */
+        .organism-card {
+            background: #FFFFFF;
+            border: 3px solid #3182CE;
+            border-radius: 16px;
+            padding: clamp(5px, 0.8vh, 10px) clamp(8px, 1vw, 14px);
+            min-width: clamp(80px, 9.5vw, 115px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .organism-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold-dark);
+        }
+
+        .organism-card.selected {
+            border-color: var(--gold-dark);
+            background: #FFFBE6;
+            transform: scale(1.05);
+            box-shadow: 0 0 12px var(--gold-light);
+        }
+
+        .organism-emoji {
+            font-size: clamp(28px, 4.8vh, 46px);
+            line-height: 1;
+        }
+
+        .organism-name {
+            font-size: clamp(12px, 1.7vh, 17px);
+            font-weight: 900;
+            margin-top: 3px;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        .chain-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(4px, 0.8vw, 10px);
+            margin: 1vh 0;
+            width: 100%;
+        }
+
+        .drop-slot {
+            width: clamp(85px, 10.5vw, 125px);
+            height: clamp(80px, 12.5vh, 115px);
+            border: 3px dashed #A0AEC0;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .drop-slot.hovered {
+            background: rgba(123, 192, 67, 0.3);
+            border-color: var(--padi-green);
+        }
+
+        .slot-label {
+            font-size: clamp(10px, 1.4vh, 14px);
+            font-weight: 800;
+            color: #718096;
+            position: absolute;
+            bottom: 4px;
+        }
+
+        .arrow-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .arrow-icon {
+            font-size: clamp(20px, 3.2vh, 30px);
+            color: var(--padi-dark);
+            font-weight: 900;
+        }
+
+        .arrow-text {
+            font-size: clamp(10px, 1.3vh, 13px);
+            font-weight: 900;
+            background: #FFF;
+            padding: 1px 6px;
+            border-radius: 8px;
+            border: 1.5px solid var(--padi-green);
+            color: var(--padi-dark);
+        }
+
+        .arrow-toggle-btn {
+            background: #FFF;
+            border: 2px solid var(--gold-dark);
+            border-radius: 8px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: clamp(11px, 1.4vh, 14px);
+            font-weight: 900;
+        }
+
+        .cards-pool {
+            display: flex;
+            gap: clamp(6px, 1vw, 12px);
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.9);
+            padding: clamp(6px, 1vh, 12px) clamp(10px, 1.5vw, 16px);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 980px;
+            min-height: clamp(70px, 10vh, 105px);
+            border: 3px solid #E2E8F0;
+        }
+
+        /* Baskets & Roles */
+        .baskets-container {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 28px);
+            justify-content: center;
+            width: 100%;
+            margin: 0.8vh 0;
+        }
+
+        .basket {
+            width: clamp(220px, 28vw, 320px);
+            min-height: clamp(110px, 17vh, 155px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 4px solid var(--sky-top);
+            border-radius: 20px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .basket.abiotic { border-color: #ED8936; }
+
+        .basket-title {
+            font-size: clamp(16px, 2.2vh, 21px);
+            font-weight: 900;
+            margin-bottom: 6px;
+            color: var(--sky-bottom);
+        }
+        .basket.abiotic .basket-title { color: #C05621; }
+
+        .basket-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            width: 100%;
+            min-height: clamp(70px, 10vh, 105px);
+        }
+
+        .reason-selector {
+            background: #FFFFFF;
+            padding: clamp(8px, 1.2vh, 14px) clamp(12px, 1.8vw, 20px);
+            border-radius: 16px;
+            border: 3px solid var(--gold-dark);
+            width: 100%;
+            max-width: 850px;
+            margin-top: 0.8vh;
+            text-align: center;
+        }
+
+        .reason-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .reason-btn {
+            background: #F7FAFC;
+            border: 2px solid #CBD5E0;
+            padding: clamp(6px, 1vh, 10px) 12px;
+            border-radius: 12px;
+            font-size: clamp(13px, 1.8vh, 17px);
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .reason-btn.selected {
+            background: #FFFBE6;
+            border-color: var(--gold-dark);
+        }
+
+        .role-badge {
+            background: linear-gradient(to bottom, #FFDC69 0%, var(--gold-dark) 100%);
+            color: #4A2800;
+            border: 2px solid #D68D00;
+            padding: clamp(5px, 0.8vh, 8px) clamp(10px, 1.2vw, 15px);
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: clamp(13px, 1.8vh, 17px);
+            cursor: grab;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+        }
+
+        /* Simulation & Multi Check */
+        .simulation-box {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 28px);
+            align-items: center;
+            justify-content: center;
+            background: #FFFFFF;
+            padding: clamp(12px, 2vh, 22px) clamp(16px, 2.5vw, 30px);
+            border-radius: 24px;
+            border: 4px solid var(--padi-green);
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            height: clamp(100px, 16vh, 140px);
+            padding: 6px;
+            border-bottom: 4px solid #2D3748;
+        }
+
+        .chart-bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bar-wrapper {
+            height: clamp(80px, 12vh, 110px);
+            width: clamp(35px, 4.5vw, 48px);
+            background: #EDF2F7;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            width: 100%;
+            background: var(--padi-green);
+            transition: height 0.6s ease;
+            height: 60%;
+        }
+        .bar-fill.down { background: var(--danger); }
+        .bar-fill.up { background: var(--padi-green); }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: clamp(13px, 1.8vh, 17px);
+            font-weight: 800;
+            background: #F7FAFC;
+            padding: clamp(6px, 1vh, 10px) 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #CBD5E0;
+        }
+
+        .checkbox-option.selected {
+            background: #E6FFFA;
+            border-color: #38B2AC;
+        }
+
+        .custom-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid #A0AEC0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #FFFFFF;
+            font-size: 14px;
+        }
+        .checkbox-option.selected .custom-check {
+            background: #38B2AC;
+            border-color: #234E52;
+            color: #FFFFFF;
+        }
+
+        /* Hints & Modal */
+        .hint-box {
+            background: #FEFCBF;
+            border: 3px solid #F6E05E;
+            color: #744210;
+            padding: clamp(6px, 1vh, 10px) clamp(12px, 1.5vw, 20px);
+            border-radius: 14px;
+            font-size: clamp(13px, 1.9vh, 18px);
+            font-weight: 800;
+            margin-top: 0.8vh;
+            text-align: center;
+            width: 100%;
+            max-width: 850px;
+            animation: shake 0.35s ease-in-out;
+            flex-shrink: 0;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .celebration-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .celebration-card {
+            background: #FFFFFF;
+            padding: clamp(16px, 3vh, 32px);
+            border-radius: 28px;
+            text-align: center;
+            border: 5px solid var(--gold-light);
+            max-width: 550px;
+            width: 88%;
+        }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        .leaf-decay-box {
+            width: clamp(70px, 10vh, 100px);
+            height: clamp(70px, 10vh, 100px);
+            font-size: clamp(40px, 6.5vh, 60px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 1s ease;
+        }
+
+        .soil-rich {
+            filter: sepia(1) hue-rotate(40deg) saturate(2);
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        /* ==========================================================================
+           16. UKURAN BESAR + LAYOUT KIRI-KANAN (TANPA SCROLL)
+           ========================================================================== */
+        .top-bar { height: clamp(54px, 8.5vh, 76px); }
+        .screen-container { max-height: calc(100dvh - clamp(54px, 8.5vh, 76px)); }
+        .app-title-sm { font-size: clamp(20px, 3.2vh, 32px); }
+
+        .btn {
+            font-size: clamp(18px, 3vh, 30px);
+            padding: clamp(10px, 1.7vh, 18px) clamp(22px, 2.6vw, 42px);
+            border-radius: 20px;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.25);
+        }
+        .btn-icon {
+            font-size: clamp(15px, 2.4vh, 22px);
+            padding: clamp(6px, 1vh, 10px) clamp(12px, 1.4vw, 20px);
+            border-radius: 16px;
+        }
+
+        /* --- layar awal, cara bermain, pilih kelompok --- */
+        .wood-board { max-width: 1100px; padding: clamp(18px, 3vh, 40px) clamp(20px, 3.5vw, 56px); }
+        .main-title { font-size: clamp(32px, 6.5vh, 64px); }
+        .story-box { font-size: clamp(18px, 3vh, 30px); padding: clamp(14px, 2.4vh, 28px); }
+        #screen-welcome .btn { font-size: clamp(22px, 4vh, 38px) !important; padding: clamp(14px, 2.2vh, 24px) clamp(30px, 4vw, 64px) !important; }
+
+        #screen-howto h2, #screen-select-team h2 { font-size: clamp(28px, 5vh, 46px) !important; }
+        #screen-select-team > p { font-size: clamp(16px, 2.6vh, 24px) !important; margin-bottom: 1.6vh !important; }
+        .instructions-grid { max-width: 1200px; gap: clamp(12px, 2vw, 28px); margin: 2vh 0 3vh; }
+        .step-card { padding: clamp(16px, 3vh, 34px) clamp(12px, 1.4vw, 24px); border-radius: 26px; border-width: 4px; }
+        .step-icon { font-size: clamp(44px, 8vh, 84px); }
+        .step-title { font-size: clamp(20px, 3.3vh, 32px); }
+        .step-desc { font-size: clamp(15px, 2.4vh, 22px); }
+
+        .team-grid { max-width: 1250px; gap: clamp(14px, 2vw, 32px); margin-top: 2vh; }
+        .team-card { padding: clamp(18px, 3.4vh, 40px) clamp(10px, 1.2vw, 20px); border-radius: 32px; border-width: 5px; }
+        .team-emoji { font-size: clamp(60px, 11.5vh, 116px); }
+        .team-name { font-size: clamp(24px, 4.2vh, 42px); }
+        .level-badge { font-size: clamp(14px, 2.2vh, 21px); padding: 5px 18px; margin: 8px 0 12px; }
+        .stars-summary { font-size: clamp(18px, 2.9vh, 29px); }
+        .completion-badge { width: clamp(38px, 5.5vh, 54px); height: clamp(38px, 5.5vh, 54px); font-size: clamp(22px, 3.2vh, 32px); }
+
+        /* --- header misi --- */
+        .game-header { max-width: 1280px; padding: clamp(8px, 1.4vh, 14px) clamp(16px, 2vw, 30px); border-radius: 22px; margin-bottom: 1.2vh; border-width: 4px; }
+        #game-team-tag { font-size: clamp(18px, 3vh, 28px) !important; }
+        .mission-title { font-size: clamp(18px, 3vh, 30px); }
+        .progress-dot { width: clamp(16px, 2.6vh, 26px); height: clamp(16px, 2.6vh, 26px); }
+
+        /* --- dua kolom: kiri = soal, kanan = kartu + tombol --- */
+        .split {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: clamp(12px, 2vw, 28px);
+            width: 100%;
+            max-width: 1280px;
+            flex: 1 1 0;
+            min-height: 0;
+            align-items: stretch;
+        }
+        .split.split-wide { grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); }
+
+        .pane-left, .pane-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(6px, 1.3vh, 16px);
+            padding: clamp(10px, 1.6vh, 22px) clamp(14px, 1.8vw, 28px);
+            border-radius: 28px;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+        }
+        .pane-left {
+            background: rgba(255, 248, 236, 0.95);
+            border: 5px solid var(--wood-border);
+        }
+        .pane-right {
+            background: linear-gradient(160deg, #8CD04F, #4C9A2A);
+            border: 5px solid var(--gold-light);
+        }
+        .pane-left > p { font-size: clamp(16px, 2.6vh, 26px) !important; margin: 0 !important; text-align: center; }
+
+        /* kartu pilihan (kanan) */
+        .pane-right .cards-pool {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(8px, 1.4vh, 16px);
+            align-content: center;
+            width: 100%;
+            max-width: none;
+            min-height: 0;
+            padding: 0;
+            background: transparent;
+            border: none;
+        }
+        .pane-right .cards-pool > :last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: 50%; }
+        .pane-right .organism-card {
+            min-width: 0; width: 100%;
+            padding: clamp(8px, 1.3vh, 16px) 6px;
+            border-radius: 20px; border-width: 4px;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.22);
+        }
+        .pane-right .organism-emoji { font-size: clamp(38px, 7.4vh, 72px); }
+        .pane-right .organism-name { font-size: clamp(14px, 2.3vh, 22px); margin-top: 4px; }
+        .pane-right .role-badge {
+            font-size: clamp(16px, 2.6vh, 26px);
+            padding: clamp(12px, 2vh, 22px) 8px;
+            border-radius: 18px; border-width: 3px;
+            text-align: center; box-shadow: 0 5px 0 rgba(0,0,0,0.22);
+        }
+        .pane-right .btn { width: 100%; margin-top: 0 !important; }
+
+        /* rantai makanan (kiri) */
+        .pane-left .chain-container { gap: clamp(2px, 0.5vw, 8px); margin: 0; width: 100%; }
+        .pane-left .drop-slot {
+            flex: 1 1 0; width: auto; min-width: 0; max-width: 230px;
+            height: clamp(130px, 27vh, 230px);
+            padding-top: clamp(18px, 3vh, 28px);
+            border-width: 4px; border-radius: 22px;
+        }
+        .drop-slot .slot-label { font-size: clamp(11px, 1.7vh, 15px); top: 6px; bottom: auto; left: 2px; right: 2px; text-align: center; line-height: 1.1; }
+        .drop-slot .organism-card { min-width: 0; width: 94%; padding: 4px 2px; border-width: 3px; }
+        .drop-slot .organism-emoji { font-size: clamp(30px, 6.2vh, 58px); }
+        .drop-slot .organism-name { font-size: clamp(11px, 1.9vh, 18px); }
+        .arrow-connector { flex-shrink: 0; }
+        .arrow-icon { font-size: clamp(24px, 4vh, 40px); }
+        .arrow-text { font-size: clamp(11px, 1.7vh, 15px); }
+        .arrow-toggle-btn { font-size: clamp(11px, 1.6vh, 15px); padding: 3px 5px; border-radius: 10px; }
+
+        /* peran (label) */
+        .role-row { display: flex !important; justify-content: center; gap: clamp(8px, 1.2vw, 18px) !important; width: 100%; margin: 0 !important; }
+        .role-col { flex: 1 1 0; min-width: 0; max-width: 200px; display: flex; flex-direction: column; align-items: center; gap: 8px !important; }
+        .role-col .organism-card { min-width: 0; width: 100%; padding: clamp(8px, 1.4vh, 16px) 4px; border-radius: 20px; border-width: 4px; cursor: default; }
+        .role-col .organism-emoji { font-size: clamp(36px, 7vh, 68px); }
+        .role-col .organism-name { font-size: clamp(13px, 2.1vh, 20px); }
+        .pane-left .role-slot { width: 100% !important; max-width: none; height: clamp(56px, 9vh, 88px) !important; padding-top: 0; flex: none; }
+        .role-slot .slot-label { top: 4px; font-size: clamp(11px, 1.6vh, 14px); }
+        .role-slot:has(.role-badge) .slot-label { display: none; }
+        .role-slot .role-badge { font-size: clamp(14px, 2.3vh, 22px); padding: 8px 6px; width: 92%; text-align: center; }
+
+        /* keranjang biotik / abiotik */
+        .pane-left .baskets-container { gap: clamp(10px, 1.6vw, 24px); margin: 0; width: 100%; }
+        .pane-left .basket { flex: 1 1 0; width: auto; min-width: 0; min-height: clamp(120px, 21vh, 210px); border-radius: 24px; border-width: 5px; padding: 8px; }
+        .basket-title { font-size: clamp(17px, 2.8vh, 26px); margin-bottom: 4px; }
+        .basket-content { gap: 8px; min-height: clamp(60px, 10vh, 110px); align-content: flex-start; }
+        .basket .organism-card { min-width: 0; width: clamp(72px, 6.6vw, 98px); padding: 4px 2px; border-width: 3px; border-radius: 14px; }
+        .basket .organism-emoji { font-size: clamp(24px, 4.2vh, 40px); }
+        .basket .organism-name { font-size: clamp(10px, 1.6vh, 14px); }
+
+        .pane-left .reason-selector { max-width: none; width: 100%; margin: 0; padding: clamp(8px, 1.3vh, 14px) clamp(14px, 1.6vw, 22px); border-radius: 22px; border-width: 4px; }
+        .reason-selector > div:first-child { font-size: clamp(15px, 2.4vh, 22px) !important; }
+        .reason-options { gap: clamp(6px, 1vh, 10px); margin-top: 8px; }
+        .reason-btn { font-size: clamp(13px, 2.1vh, 20px); padding: clamp(6px, 1.2vh, 12px) 14px; border-radius: 14px; border-width: 3px; }
+
+        /* bonus pengurai */
+        .bonus-banner { text-align: center; }
+        .bonus-banner span { display: inline-block; background: var(--gold-light); padding: 4px 16px; border-radius: 12px; font-weight: 900; font-size: clamp(13px, 2vh, 18px); color: #4A2800; }
+        .bonus-banner h3 { font-size: clamp(20px, 3.3vh, 32px); color: var(--padi-dark); margin-top: 8px; }
+        .bonus-stage { display: flex; align-items: center; justify-content: center; gap: clamp(14px, 2vw, 32px); width: 100%; flex-wrap: nowrap; }
+        .bonus-stage .leaf-decay-box { width: clamp(90px, 15vh, 150px); height: clamp(90px, 15vh, 150px); font-size: clamp(56px, 10vh, 100px); flex-shrink: 0; }
+        .bonus-stage p { font-size: clamp(15px, 2.4vh, 22px); font-weight: 800; text-align: center; margin-bottom: 8px; }
+        .bonus-stage .drop-slot { flex-direction: row; flex-wrap: wrap; gap: 6px; width: 100%; max-width: none; height: clamp(120px, 22vh, 190px); }
+        .bonus-stage .drop-slot .organism-card { width: 44%; }
+
+        /* simulasi & analisis dampak (satu panel penuh) */
+        .simulation-box { max-width: 1280px; gap: clamp(16px, 3vw, 48px); padding: clamp(16px, 3vh, 34px) clamp(20px, 3vw, 48px); border-radius: 30px; border-width: 5px; }
+        .simulation-box > div:first-child { max-width: 400px !important; }
+        .simulation-box > div:first-child > div { font-size: clamp(48px, 9vh, 90px) !important; }
+        .simulation-box h3 { font-size: clamp(20px, 3.3vh, 32px) !important; }
+        .simulation-box p { font-size: clamp(16px, 2.5vh, 24px) !important; }
+        .chart-container { height: clamp(150px, 27vh, 240px); }
+        .bar-wrapper { height: clamp(120px, 22vh, 200px); width: clamp(64px, 7vw, 100px); }
+        .bar-wrapper + span { font-size: clamp(16px, 2.4vh, 22px) !important; }
+        .simulation-box .btn { width: 100%; }
+        #mission-stage-container > div[style*="max-width:850px"] { max-width: 1150px !important; padding: clamp(18px, 3vh, 36px) !important; border-radius: 30px !important; border-width: 5px !important; }
+        #mission-stage-container > div[style*="max-width:850px"] h3 { font-size: clamp(22px, 3.8vh, 36px) !important; }
+        #mission-stage-container > div[style*="max-width:850px"] p { font-size: clamp(17px, 2.7vh, 26px) !important; }
+        .checkbox-option { font-size: clamp(16px, 2.7vh, 25px); padding: clamp(12px, 2.2vh, 24px) 18px; border-radius: 18px; border-width: 3px; gap: 14px; }
+        .custom-check { width: clamp(26px, 3.6vh, 36px); height: clamp(26px, 3.6vh, 36px); font-size: clamp(16px, 2.4vh, 22px); flex-shrink: 0; }
+
+        .hint-box { max-width: 1280px; font-size: clamp(14px, 2.2vh, 20px); padding: clamp(6px, 1.1vh, 12px) clamp(14px, 2vw, 28px); border-radius: 18px; border-width: 4px; margin-top: 1vh; }
+
+        .celebration-card { max-width: 640px; padding: clamp(20px, 4vh, 44px); border-radius: 34px; }
+        .star-rating { font-size: clamp(44px, 9vh, 80px); margin: 1vh 0 2vh; }
+        #result-stars-list { font-size: clamp(16px, 2.6vh, 24px) !important; }
+
+        @media (max-width: 760px) {
+            .split, .split.split-wide { grid-template-columns: 1fr; }
+        }
+
+        [draggable="true"] { touch-action: none; -webkit-touch-callout: none; cursor: grab; }
+        .drag-origin { opacity: 0.3; }
+        .drag-ghost { transform: scale(1.1) rotate(-3deg); box-shadow: 0 14px 28px rgba(0,0,0,0.4) !important; opacity: 0.95; cursor: grabbing; }
+        .drop-slot.hovered, .basket-content.hovered { background: rgba(123, 192, 67, 0.3); outline: 4px dashed var(--padi-green); outline-offset: -4px; border-radius: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <!-- SVG BACKGROUND SAWAH -->
+    <div class="sun-glow"></div>
+    <svg class="sky-scene" preserveAspectRatio="none" viewBox="0 0 1200 400">
+        <path class="cloud" d="M 120 90 Q 150 60 190 80 Q 220 50 260 80 Q 290 90 270 120 Q 100 130 120 90 Z" />
+        <path class="cloud" d="M 680 110 Q 710 80 750 100 Q 780 70 820 100 Q 850 110 830 140 Q 660 150 680 110 Z" style="animation-duration: 42s; animation-delay: -10s;" />
+    </svg>
+
+    <svg class="sawah-landscape" preserveAspectRatio="none" viewBox="0 0 1200 400">
+        <path d="M 0 180 Q 350 100 700 160 T 1200 130 L 1200 400 L 0 400 Z" fill="#7BC043" opacity="0.85"/>
+        <path d="M 0 230 Q 450 160 850 240 T 1200 210 L 1200 400 L 0 400 Z" fill="#4C9A2A"/>
+        <g class="rice-stalk">
+            <path d="M 150 400 Q 155 330 170 290" stroke="#FFC93C" stroke-width="6" fill="none"/>
+            <circle cx="170" cy="290" r="7" fill="#FFC93C"/>
+        </g>
+        <g class="rice-stalk" style="animation-delay: -1.5s;">
+            <path d="M 550 400 Q 555 320 575 270" stroke="#FFC93C" stroke-width="7" fill="none"/>
+            <circle cx="575" cy="270" r="8" fill="#FFC93C"/>
+        </g>
+        <g class="rice-stalk" style="animation-delay: -0.8s;">
+            <path d="M 920 400 Q 925 340 940 300" stroke="#FFC93C" stroke-width="6" fill="none"/>
+            <circle cx="940" cy="300" r="7" fill="#FFC93C"/>
+        </g>
+    </svg>
+
+    <!-- NAVIGATION BAR -->
+    <header class="top-bar">
+        <div class="app-title-sm">
+            🌾 Misi Rantai Makanan Sawah
+        </div>
+        <div class="nav-controls">
+            <button class="btn btn-icon" id="btn-home" style="display:none;" onclick="showScreen('screen-select-team')">🏠 Menu</button>
+            <button class="btn btn-icon" id="btn-reset" style="display:none;" onclick="restartCurrentMission()">🔄 Ulangi</button>
+            <button class="btn btn-icon" id="btn-read" style="display:none;" onclick="playClickSound(); narrateMission()">🔈 Bacakan</button>
+            <button class="btn btn-icon" id="btn-voice" onclick="toggleNarrator()">🗣️ Narator</button>
+            <button class="btn btn-icon" id="btn-audio" onclick="toggleAudio()">🔊 Suara</button>
+        </div>
+    </header>
+
+    <!-- MAIN SCREENS CONTAINER -->
+    <main class="screen-container">
+
+        <!-- SCREEN 1: WELCOME -->
+        <section id="screen-welcome" class="screen active">
+            <div class="wood-board">
+                <h1 class="main-title">🌾 MISI RANTAI MAKANAN 🌾</h1>
+                <div class="story-box">
+                    <strong>Hati-hati!</strong> Pak Tani butuh bantuan <strong>Tim Penjaga Sawah</strong>! Rantai makanan di ekosistem sawah sedang terganggu. Mari bantu menyusun dan menyeimbangkan kembali ekosistem sawah!
+                </div>
+                <button class="btn btn-icon" style="margin-bottom: 1.8vh;" onclick="narrateScreen('screen-welcome')">🔈 Dengarkan Cerita</button>
+                <button class="btn btn-primary" style="font-size: clamp(20px, 3.5vh, 32px); padding: 14px 40px;" onclick="playClickSound(); showScreen('screen-howto')">
+                    🚀 Mulai Petualangan
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: HOW TO PLAY -->
+        <section id="screen-howto" class="screen">
+            <h2 style="font-size: clamp(22px, 3.8vh, 34px); color: #FFF; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin-bottom: 0.8vh;">📋 Cara Bermain</h2>
+            <div class="instructions-grid">
+                <div class="step-card">
+                    <span class="step-icon">👆 / 🖱️</span>
+                    <h3 class="step-title">1. Geser & Ketuk</h3>
+                    <p class="step-desc">Pilih kartu atau geser ke dalam kotak yang tersedia sesuai urutan.</p>
+                </div>
+                <div class="step-card">
+                    <span class="step-icon">➡️</span>
+                    <h3 class="step-title">2. Arah Panah</h3>
+                    <p class="step-desc">Perhatikan panah! Panah berarti <strong>"Dimakan Oleh"</strong>.</p>
+                </div>
+                <div class="step-card">
+                    <span class="step-icon">🌟</span>
+                    <h3 class="step-title">3. Raih Bintang</h3>
+                    <p class="step-desc">Selesaikan misi dengan teliti untuk mendapatkan 3 Bintang Emas!</p>
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="playClickSound(); showScreen('screen-select-team')">
+                Lanjut Pilih Kelompok ➡️
+            </button>
+        </section>
+
+        <!-- SCREEN 3: TEAM SELECTION -->
+        <section id="screen-select-team" class="screen">
+            <h2 style="font-size: clamp(22px, 3.8vh, 34px); color: #FFF; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">👥 Pilih Kelompok Belajar</h2>
+            <p style="font-size: clamp(14px, 2.1vh, 19px); color: #FFF; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); margin-bottom: 0.8vh;">Pilih tingkat tantangan sesuai kelompokmu:</p>
+            
+            <div class="team-grid">
+                <div class="team-card pipit" onclick="selectTeam('pipit')">
+                    <div id="badge-pipit" class="completion-badge" style="display:none;">✓</div>
+                    <div class="team-emoji">🐦</div>
+                    <div class="team-name" style="color: var(--padi-dark);">Tim Pipit</div>
+                    <div class="level-badge">Tingkat: Berkembang</div>
+                    <div class="stars-summary" id="stars-pipit">⭐⭐⭐ (0/12)</div>
+                </div>
+
+                <div class="team-card laba" onclick="selectTeam('laba')">
+                    <div id="badge-laba" class="completion-badge" style="display:none;">✓</div>
+                    <div class="team-emoji">🕷️</div>
+                    <div class="team-name" style="color: var(--gold-dark);">Tim Laba-laba</div>
+                    <div class="level-badge">Tingkat: Siap</div>
+                    <div class="stars-summary" id="stars-laba">⭐⭐⭐ (0/12)</div>
+                </div>
+
+                <div class="team-card elang" onclick="selectTeam('elang')">
+                    <div id="badge-elang" class="completion-badge" style="display:none;">✓</div>
+                    <div class="team-emoji">🦅</div>
+                    <div class="team-name" style="color: #E53E3E;">Tim Elang</div>
+                    <div class="level-badge">Tingkat: Mahir</div>
+                    <div class="stars-summary" id="stars-elang">⭐⭐⭐ (0/15)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: GAMEPLAY AREA -->
+        <section id="screen-game" class="screen">
+            <div class="game-header">
+                <div id="game-team-tag" style="font-size: clamp(15px, 2.2vh, 20px); font-weight: 900; color: var(--sky-bottom);">
+                    🐦 Tim Pipit
+                </div>
+                <div class="mission-title" id="game-mission-title">
+                    Misi 1: Susun Rantai Makanan
+                </div>
+                <div class="mission-progress" id="mission-dots"></div>
+            </div>
+
+            <div id="mission-stage-container" style="width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;"></div>
+
+            <div id="hint-display" class="hint-box" style="display: none;">
+                💡 Petunjuk akan muncul di sini.
+            </div>
+        </section>
+
+        <!-- SCREEN 5: RESULT / SUMMARY -->
+        <section id="screen-result" class="screen">
+            <div class="wood-board" style="max-width: 750px;">
+                <h1 style="font-size: clamp(24px, 4vh, 38px); color: var(--padi-dark); margin-bottom: 0.8vh;">🎉 MISI SELESAI! 🎉</h1>
+                <p id="result-team-name" style="font-size: clamp(18px, 2.6vh, 24px); font-weight: 900; color: var(--gold-dark);">Tim Pipit Hebat!</p>
+                
+                <div id="result-stars-list" style="margin: 1.5vh 0; font-size: clamp(14px, 2.1vh, 19px); text-align: left; background: #FFF; padding: 12px; border-radius: 16px; border: 2px solid #E2E8F0; width: 100%;"></div>
+
+                <div style="font-size: clamp(20px, 3vh, 26px); font-weight: 900; color: var(--padi-dark); margin-bottom: 1.5vh;">
+                    Total Bintang: <span id="result-total-stars" style="color: var(--gold-dark);">12 / 12 ⭐</span>
+                </div>
+
+                <button class="btn btn-primary" onclick="playClickSound(); showScreen('screen-select-team')">
+                    🔄 Kembali ke Pilih Kelompok
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CELEBRATION MODAL OVERLAY -->
+    <div id="celebration-overlay" class="celebration-overlay">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="celebration-card">
+            <h2 style="font-size: clamp(24px, 4vh, 36px); color: var(--padi-dark);">HEBAT! 🌟</h2>
+            <p style="font-size: clamp(16px, 2.3vh, 22px); color: #4A5568; margin-top: 4px;">Misi berhasil diselesaikan!</p>
+            <div class="star-rating" id="modal-stars">⭐⭐⭐</div>
+            <button class="btn btn-success" onclick="closeCelebrationAndNext()">Lanjut Misi ➡️</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ==========================================================================
+   8. SYNTHESIZER SOUND ENGINE (NATIVE WEB AUDIO API)
+   ========================================================================== */
+class SoundEffects {
+    constructor() {
+        this.ctx = null;
+        this.muted = false;
+    }
+
+    init() {
+        if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+        }
+    }
+
+    playTone(freq, type, duration, delay = 0) {
+        if (this.muted) return;
+        this.init();
+        setTimeout(() => {
+            try {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            } catch (e) {}
+        }, delay * 1000);
+    }
+
+    playClick() { this.playTone(600, 'sine', 0.07); }
+    playCorrect() {
+        this.playTone(523.25, 'triangle', 0.1, 0);   
+        this.playTone(659.25, 'triangle', 0.1, 0.08); 
+        this.playTone(783.99, 'triangle', 0.18, 0.16); 
+        this.playTone(1046.50, 'triangle', 0.25, 0.24); 
+    }
+    playWrong() {
+        this.playTone(220, 'sawtooth', 0.12, 0);
+        this.playTone(180, 'sawtooth', 0.2, 0.1);
+    }
+    playSuccessFanfare() {
+        const notes = [400, 500, 600, 800, 1000];
+        notes.forEach((freq, idx) => {
+            this.playTone(freq, 'sine', 0.18, idx * 0.1);
+        });
+    }
+}
+
+const soundFX = new SoundEffects();
+
+function toggleAudio() {
+    soundFX.muted = !soundFX.muted;
+    const btn = document.getElementById('btn-audio');
+    btn.innerHTML = soundFX.muted ? '🔇 Bisu' : '🔊 Suara';
+}
+
+function playClickSound() { soundFX.playClick(); }
+
+
+/* ==========================================================================
+   8b. NARATOR / DUBBING (Web Speech API - suara bawaan perangkat, bahasa Indonesia)
+   ========================================================================== */
+const Narrator = {
+    supported: ('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window),
+    enabled: true,
+    voice: null,
+    timer: null,
+
+    pickVoice() {
+        if (!this.supported) return;
+        const voices = speechSynthesis.getVoices() || [];
+        this.voice = voices.find(v => /^id[-_]/i.test(v.lang))
+                  || voices.find(v => /indonesia/i.test(v.name))
+                  || null;
+    },
+
+    clean(text) {
+        return String(text)
+            .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, ' ')
+            .replace(/&/g, ' dan ')
+            .replace(/\+/g, ' plus ')
+            .replace(/[()]/g, ' ')
+            .replace(/\bK-IV\b/g, 'Konsumen empat')
+            .replace(/\bK-III\b/g, 'Konsumen tiga')
+            .replace(/\bK-II\b/g, 'Konsumen dua')
+            .replace(/\bK-I\b/g, 'Konsumen satu')
+            .replace(/\bKonsumen IV\b/g, 'Konsumen empat')
+            .replace(/\bKonsumen III\b/g, 'Konsumen tiga')
+            .replace(/\bKonsumen II\b/g, 'Konsumen dua')
+            .replace(/\bKonsumen I\b/g, 'Konsumen satu')
+            .replace(/\s+([.!?:;,])/g, '$1')
+            .replace(/\s+/g, ' ')
+            .trim();
+    },
+
+    speak(text) {
+        if (!this.supported || !this.enabled || !text) return;
+        const clean = this.clean(text);
+        if (!clean) return;
+        clearTimeout(this.timer);
+        speechSynthesis.cancel();
+        // jeda kecil agar cancel() tidak menelan ucapan berikutnya
+        this.timer = setTimeout(() => {
+            const parts = clean.match(/[^.!?:;]+[.!?:;]*/g) || [clean];
+            parts.forEach(part => {
+                const t = part.trim();
+                if (!t) return;
+                const u = new SpeechSynthesisUtterance(t);
+                u.lang = 'id-ID';
+                if (this.voice) u.voice = this.voice;
+                u.rate = 0.92;
+                u.pitch = 1.12;
+                speechSynthesis.speak(u);
+            });
+        }, 70);
+    },
+
+    stop() {
+        if (!this.supported) return;
+        clearTimeout(this.timer);
+        speechSynthesis.cancel();
+    }
+};
+
+if (Narrator.supported) {
+    Narrator.pickVoice();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = () => Narrator.pickVoice();
+    }
+    window.addEventListener('pagehide', () => Narrator.stop());
+} else {
+    document.addEventListener('DOMContentLoaded', () => {
+        const b = document.getElementById('btn-voice');
+        if (b) b.style.display = 'none';
+        document.querySelectorAll('[onclick^="narrateScreen"]').forEach(x => x.style.display = 'none');
+    });
+}
+
+function toggleNarrator() {
+    Narrator.enabled = !Narrator.enabled;
+    const btn = document.getElementById('btn-voice');
+    btn.innerHTML = Narrator.enabled ? '🗣️ Narator' : '🤐 Narator Mati';
+    if (!Narrator.enabled) Narrator.stop();
+    else { playClickSound(); Narrator.speak('Narator hidup.'); }
+}
+
+const SCREEN_NARRATION = {
+    'screen-welcome': 'Halo, teman-teman! Pak Tani butuh bantuan Tim Penjaga Sawah! Rantai makanan di ekosistem sawah sedang terganggu. Yuk, bantu menyusun dan menyeimbangkan kembali ekosistem sawah! Tekan tombol Mulai Petualangan.',
+    'screen-howto': 'Cara bermain. Satu: geser kartu dengan jarimu, atau ketuk kartu lalu ketuk kotak yang tersedia. Dua: perhatikan arah panah. Panah berarti, dimakan oleh. Tiga: selesaikan misi dengan teliti untuk mendapatkan tiga bintang emas. Tekan Lanjut untuk memilih kelompok.',
+    'screen-select-team': 'Pilih kelompok belajarmu! Tim Pipit untuk tingkat berkembang. Tim Laba-laba untuk tingkat siap. Tim Elang untuk tingkat mahir.'
+};
+
+function narrateScreen(screenId) {
+    if (screenId === 'screen-result') {
+        const team = GAME_DATA[currentTeam];
+        const total = team.stars.reduce((a, b) => a + b, 0);
+        const max = team.missionsCount * 3;
+        Narrator.speak(`Selamat! ${team.name} menyelesaikan semua misi. Total bintang kamu, ${total} dari ${max}. Sawah Pak Tani kembali seimbang. Terima kasih, Penjaga Sawah!`);
+        return;
+    }
+    Narrator.speak(SCREEN_NARRATION[screenId]);
+}
+
+function narrateMission() {
+    const c = document.getElementById('mission-stage-container');
+    if (!c) return;
+    const parts = [];
+    const title = document.getElementById('game-mission-title').innerText;
+    parts.push(title.replace(/^Misi\s+(\d+)\s*:/i, 'Misi $1.').replace(/^Misi Bonus\s*:/i, 'Misi bonus.').replace(/[.!?:]*$/, '.'));
+
+    const seen = new Set();
+    c.querySelectorAll('h3, p').forEach(el => {
+        if (el.closest('.reason-selector')) return;
+        const t = el.innerText.trim();
+        if (t && !seen.has(t)) { seen.add(t); parts.push(t.replace(/[.!?:]*$/, '.')); }
+    });
+
+    const reason = c.querySelector('.reason-selector');
+    if (reason) {
+        const q = reason.querySelector(':scope > div');
+        if (q) parts.push(q.innerText.trim());
+        reason.querySelectorAll('.reason-btn').forEach(b => {
+            parts.push(b.innerText.trim().replace(/^([A-C])\.\s*/, 'Pilihan $1: ').replace(/[.!?]*$/, '.'));
+        });
+    }
+    const checks = c.querySelectorAll('.checkbox-option span');
+    if (checks.length) {
+        parts.push('Pilihannya:');
+        checks.forEach(sp => parts.push(sp.innerText.trim().replace(/[.!?]*$/, '.')));
+    }
+    Narrator.speak(parts.join(' '));
+}
+
+/* ==========================================================================
+   9. GAME DATA & STATE
+   ========================================================================== */
+const GAME_DATA = {
+    pipit: { name: 'Tim Pipit', icon: '🐦', level: 'Berkembang', missionsCount: 4, completed: false, stars: [0, 0, 0, 0] },
+    laba: { name: 'Tim Laba-laba', icon: '🕷️', level: 'Siap', missionsCount: 4, completed: false, stars: [0, 0, 0, 0] },
+    elang: { name: 'Tim Elang', icon: '🦅', level: 'Mahir', missionsCount: 5, completed: false, stars: [0, 0, 0, 0, 0] }
+};
+
+let currentTeam = 'pipit';
+let currentMissionIdx = 0;
+let missionErrors = 0;
+let selectedCard = null;
+
+const ORGANISMS = {
+    padi: { id: 'padi', name: 'Padi', emoji: '🌾', type: 'biotic', role: 'Produsen' },
+    belalang: { id: 'belalang', name: 'Belalang', emoji: '🦗', type: 'biotic', role: 'Konsumen I' },
+    pipit: { id: 'pipit', name: 'Burung Pipit', emoji: '🐦', type: 'biotic', role: 'Konsumen I' },
+    laba: { id: 'laba', name: 'Laba-laba', emoji: '🕷️', type: 'biotic', role: 'Konsumen II' },
+    ular: { id: 'ular', name: 'Ular', emoji: '🐍', type: 'biotic', role: 'Konsumen III' },
+    elang: { id: 'elang', name: 'Elang', emoji: '🦅', type: 'biotic', role: 'Konsumen II' },
+    jamur: { id: 'jamur', name: 'Jamur', emoji: '🍄', type: 'biotic', role: 'Pengurai' },
+    bakteri: { id: 'bakteri', name: 'Bakteri', emoji: '🧫', type: 'biotic', role: 'Pengurai' },
+    air: { id: 'air', name: 'Air', emoji: '💧', type: 'abiotic', role: 'Abiotik' },
+    matahari: { id: 'matahari', name: 'Sinar Matahari', emoji: '☀️', type: 'abiotic', role: 'Abiotik' },
+    tanah: { id: 'tanah', name: 'Tanah', emoji: '🟤', type: 'abiotic', role: 'Abiotik' }
+};
+
+/* ==========================================================================
+   10. NAVIGATION & UI CONTROLLER
+   ========================================================================== */
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+
+    const isGame = screenId === 'screen-game';
+    document.getElementById('btn-home').style.display = isGame ? 'inline-flex' : 'none';
+    document.getElementById('btn-reset').style.display = isGame ? 'inline-flex' : 'none';
+    document.getElementById('btn-read').style.display = (isGame && Narrator.supported) ? 'inline-flex' : 'none';
+
+    if (!isGame) narrateScreen(screenId);
+}
+
+function selectTeam(teamKey) {
+    playClickSound();
+    currentTeam = teamKey;
+    currentMissionIdx = 0;
+    startMission();
+    showScreen('screen-game');
+}
+
+function updateTeamSelectionUI() {
+    Object.keys(GAME_DATA).forEach(key => {
+        const data = GAME_DATA[key];
+        const badge = document.getElementById(`badge-${key}`);
+        const starsText = document.getElementById(`stars-${key}`);
+        
+        if (data.completed) {
+            badge.style.display = 'flex';
+            const totalEarned = data.stars.reduce((a, b) => a + b, 0);
+            const maxStars = data.missionsCount * 3;
+            starsText.innerText = `⭐ ${totalEarned}/${maxStars} Bintang`;
+        }
+    });
+}
+
+function startMission() {
+    missionErrors = 0;
+    hideHint();
+    selectedCard = null;
+
+    const team = GAME_DATA[currentTeam];
+    document.getElementById('game-team-tag').innerText = `${team.icon} ${team.name}`;
+    
+    const dotsContainer = document.getElementById('mission-dots');
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < team.missionsCount; i++) {
+        const dot = document.createElement('div');
+        dot.className = `progress-dot ${i === currentMissionIdx ? 'active' : (i < currentMissionIdx ? 'done' : '')}`;
+        dotsContainer.appendChild(dot);
+    }
+
+    const container = document.getElementById('mission-stage-container');
+    container.innerHTML = '';
+
+    if (currentTeam === 'pipit') renderPipitMissions(container);
+    else if (currentTeam === 'laba') renderLabaMissions(container);
+    else if (currentTeam === 'elang') renderElangMissions(container);
+
+    arrangeSplit(container);
+    narrateMission();
+}
+
+/* Susun layout kiri (soal) dan kanan (kartu + tombol) */
+function arrangeSplit(container) {
+    const pool = container.querySelector(':scope > #pool');
+    if (!pool) return;
+
+    const left = document.createElement('div');
+    left.className = 'pane-left';
+    const right = document.createElement('div');
+    right.className = 'pane-right';
+
+    Array.from(container.children).forEach(ch => {
+        if (ch === pool || ch.classList.contains('btn')) right.appendChild(ch);
+        else left.appendChild(ch);
+    });
+
+    const split = document.createElement('div');
+    split.className = 'split';
+    split.appendChild(left);
+    split.appendChild(right);
+    container.appendChild(split);
+
+    // slot peran: tandai kolom & baris agar ukurannya mengikuti lebar panel
+    left.querySelectorAll('.drop-slot[data-expected]').forEach(slot => {
+        if (/^(Produsen|Konsumen)/.test(slot.dataset.expected)) {
+            slot.classList.add('role-slot');
+            slot.parentElement.classList.add('role-col');
+            slot.parentElement.parentElement.classList.add('role-row');
+        }
+    });
+
+    // rantai 5 slot / 5 peran butuh kolom kiri yang lebih lebar
+    const wide = left.querySelectorAll('.chain-container .drop-slot').length >= 5
+              || left.querySelectorAll('.role-col').length >= 5;
+    if (wide) split.classList.add('split-wide');
+}
+
+function restartCurrentMission() {
+    playClickSound();
+    startMission();
+}
+
+function showHint(text) {
+    const hintBox = document.getElementById('hint-display');
+    hintBox.innerText = text;
+    hintBox.style.display = 'block';
+}
+
+function hideHint() {
+    document.getElementById('hint-display').style.display = 'none';
+}
+
+function handleMistake(hint1, hint2) {
+    missionErrors++;
+    soundFX.playWrong();
+    if (missionErrors === 1) {
+        showHint(`💡 Petunjuk: ${hint1}`);
+        Narrator.speak(`Ups, belum tepat. Petunjuk: ${hint1}`);
+    } else {
+        showHint(`💡 Bantuan: ${hint2}`);
+        Narrator.speak(`Belum tepat, coba lagi ya. Bantuan: ${hint2}`);
+    }
+}
+
+function triggerMissionSuccess() {
+    soundFX.playCorrect();
+    let starsEarned = 3;
+    if (missionErrors === 1) starsEarned = 2;
+    else if (missionErrors >= 2) starsEarned = 1;
+
+    GAME_DATA[currentTeam].stars[currentMissionIdx] = starsEarned;
+
+    const overlay = document.getElementById('celebration-overlay');
+    const starsElem = document.getElementById('modal-stars');
+    starsElem.innerText = '⭐'.repeat(starsEarned);
+    const praise = starsEarned === 3 ? 'Hebat sekali! Kamu mendapat tiga bintang.' : (starsEarned === 2 ? 'Bagus! Kamu mendapat dua bintang.' : 'Kamu berhasil! Kamu mendapat satu bintang. Ayo coba lebih teliti lagi.');
+    Narrator.speak(praise);
+    overlay.style.display = 'flex';
+    triggerConfetti();
+}
+
+function closeCelebrationAndNext() {
+    playClickSound();
+    document.getElementById('celebration-overlay').style.display = 'none';
+    
+    const team = GAME_DATA[currentTeam];
+    if (currentMissionIdx < team.missionsCount - 1) {
+        currentMissionIdx++;
+        startMission();
+    } else {
+        team.completed = true;
+        updateTeamSelectionUI();
+        renderFinalResults();
+        showScreen('screen-result');
+        soundFX.playSuccessFanfare();
+    }
+}
+
+function triggerConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    const particles = [];
+    const colors = ['#FFC93C', '#7BC043', '#7EC8F2', '#FF4757', '#FFFFFF'];
+
+    for (let i = 0; i < 60; i++) {
+        particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10 - 3,
+            size: Math.random() * 7 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)]
+        });
+    }
+
+    let frame = 0;
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.18;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        frame++;
+        if (frame < 50) requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+/* ==========================================================================
+   11. TIM PIPIT (BERKEMBANG) MISSIONS
+   ========================================================================== */
+function renderPipitMissions(container) {
+    if (currentMissionIdx === 0) {
+        document.getElementById('game-mission-title').innerText = "Misi 1: Susun Rantai Makanan (3 Kartu)";
+        const shuffled = [ORGANISMS.padi, ORGANISMS.pipit, ORGANISMS.elang].sort(() => Math.random() - 0.5);
+
+        container.innerHTML = `
+            <p style="font-size: clamp(14px, 2vh, 19px); margin-bottom: 0.8vh; font-weight:800;">Geser atau Ketuk kartu ke dalam kotak yang tepat!</p>
+            <div class="chain-container">
+                <div class="drop-slot" data-expected="padi"><span class="slot-label">1. Produsen</span></div>
+                <div class="arrow-connector"><span class="arrow-icon">➡️</span><span class="arrow-text">dimakan oleh</span></div>
+                <div class="drop-slot" data-expected="pipit"><span class="slot-label">2. Konsumen I</span></div>
+                <div class="arrow-connector"><span class="arrow-icon">➡️</span><span class="arrow-text">dimakan oleh</span></div>
+                <div class="drop-slot" data-expected="elang"><span class="slot-label">3. Konsumen II</span></div>
+            </div>
+            <div class="cards-pool" id="pool"></div>
+            <button class="btn btn-primary" style="margin-top:1.2vh;" onclick="checkChain3()">Cek Jawaban ✔️</button>
+        `;
+        renderPoolCards(shuffled);
+        initDragAndDrop();
+    } 
+    else if (currentMissionIdx === 1) {
+        document.getElementById('game-mission-title').innerText = "Misi 2: Komponen Biotik & Abiotik";
+        container.innerHTML = `
+            <p style="font-size: clamp(14px, 2vh, 19px); margin-bottom: 0.8vh; font-weight:800;">Kelompokkan ke keranjang yang benar, lalu pilih alasannya!</p>
+            <div class="baskets-container">
+                <div class="basket biotic" data-basket="biotic">
+                    <div class="basket-title">🌱 BIOTIK</div>
+                    <div class="basket-content" id="b-biotic"></div>
+                </div>
+                <div class="basket abiotic" data-basket="abiotic">
+                    <div class="basket-title">🪨 ABIOTIK</div>
+                    <div class="basket-content" id="b-abiotic"></div>
+                </div>
+            </div>
+            <div class="cards-pool" id="pool"></div>
+            
+            <div class="reason-selector">
+                <div style="font-size: clamp(13px, 1.8vh, 17px); font-weight: 800;">Mengapa Padi disebut Makhluk Hidup (Biotik)?</div>
+                <div class="reason-options">
+                    <button class="reason-btn" onclick="selectReason(this, false)">A. Karena berwarna hijau dan berada di sawah</button>
+                    <button class="reason-btn" onclick="selectReason(this, true)">B. Karena bernapas, tumbuh, dan membutuhkan makanan</button>
+                    <button class="reason-btn" onclick="selectReason(this, false)">C. Karena tidak bisa bergerak bebas</button>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:0.8vh;" onclick="checkBiotikPipit()">Cek Jawaban ✔️</button>
+        `;
+        renderPoolCards([ORGANISMS.padi, ORGANISMS.air]);
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 2) {
+        document.getElementById('game-mission-title').innerText = "Misi 3: Pasang Peran Makhluk Hidup";
+        container.innerHTML = `
+            <p style="font-size: clamp(14px, 2vh, 19px); margin-bottom: 1vh; font-weight:800;">Pasangkan label Peran ke organisme yang tepat!</p>
+            <div style="display:flex; gap:clamp(10px, 2vw, 20px); margin-bottom:1.2vh;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    ${createOrganismCardHtml(ORGANISMS.padi)}
+                    <div class="drop-slot" data-expected="Produsen" style="width:clamp(95px, 10vw, 120px); height:clamp(40px, 5.5vh, 50px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    ${createOrganismCardHtml(ORGANISMS.pipit)}
+                    <div class="drop-slot" data-expected="Konsumen I" style="width:clamp(95px, 10vw, 120px); height:clamp(40px, 5.5vh, 50px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    ${createOrganismCardHtml(ORGANISMS.elang)}
+                    <div class="drop-slot" data-expected="Konsumen II" style="width:clamp(95px, 10vw, 120px); height:clamp(40px, 5.5vh, 50px);"><span class="slot-label">Peran</span></div>
+                </div>
+            </div>
+            <div class="cards-pool" id="pool">
+                <div class="role-badge" draggable="true" data-id="Produsen">Produsen</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen I">Konsumen I</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen II">Konsumen II</div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:1.2vh;" onclick="checkRolesPipit()">Cek Jawaban ✔️</button>
+        `;
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 3) {
+        document.getElementById('game-mission-title').innerText = "Misi 4: Detektif Keseimbangan Sawah";
+        container.innerHTML = `
+            <div class="simulation-box">
+                <div style="text-align:center; max-width:300px;">
+                    <div style="font-size: clamp(32px, 5.5vh, 46px);">🐦 ❌</div>
+                    <h3 style="font-size: clamp(16px, 2.3vh, 20px); color: var(--danger);">Jika Burung Pipit Hilang/Punah...</h3>
+                    <p style="font-size: clamp(13px, 1.8vh, 17px); margin-top: 4px;">Bagaimana nasib populasi <strong>Elang 🦅</strong>?</p>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-bar-group">
+                        <div class="bar-wrapper"><div class="bar-fill" id="bar-elang"></div></div>
+                        <span style="font-size: clamp(13px, 1.8vh, 17px); font-weight:800;">Elang 🦅</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn btn-primary" onclick="runPipitSim('up')">📈 Populasi Elang Naik</button>
+                    <button class="btn btn-primary" onclick="runPipitSim('down')">📉 Populasi Elang Turun</button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function checkChain3() {
+    const slots = document.querySelectorAll('.drop-slot');
+    let correct = true;
+    slots.forEach(slot => {
+        const card = slot.querySelector('.organism-card');
+        if (!card || card.dataset.id !== slot.dataset.expected) correct = false;
+    });
+
+    if (correct) triggerMissionSuccess();
+    else handleMistake("Padi adalah makanan burung pipit, dan burung pipit dimakan elang.", "Urutan yang benar: Padi 🌾 → Burung Pipit 🐦 → Elang 🦅.");
+}
+
+function checkBiotikPipit() {
+    const bioContent = document.getElementById('b-biotic').querySelector('[data-id="padi"]');
+    const abioContent = document.getElementById('b-abiotic').querySelector('[data-id="air"]');
+    const selectedReason = document.querySelector('.reason-btn.selected');
+
+    if (bioContent && abioContent && selectedReason && selectedReason.dataset.correct === "true") triggerMissionSuccess();
+    else handleMistake("Padi adalah biotik dan Air adalah abiotik. Pilih alasan B.", "Padi termasuk Biotik karena bernapas & tumbuh. Air termasuk Abiotik.");
+}
+
+function checkRolesPipit() {
+    const slots = document.querySelectorAll('.drop-slot');
+    let correct = true;
+    slots.forEach(slot => {
+        const badge = slot.querySelector('.role-badge');
+        if (!badge || badge.dataset.id !== slot.dataset.expected) correct = false;
+    });
+
+    if (correct) triggerMissionSuccess();
+    else handleMistake("Padi membuat makanan sendiri (Produsen). Burung pipit pemakan tumbuhan (Konsumen I).", "Padi = Produsen, Burung Pipit = Konsumen I, Elang = Konsumen II.");
+}
+
+function runPipitSim(choice) {
+    const barElang = document.getElementById('bar-elang');
+    if (choice === 'down') {
+        barElang.style.height = '20%';
+        barElang.className = 'bar-fill down';
+        setTimeout(() => triggerMissionSuccess(), 800);
+    } else {
+        barElang.style.height = '90%';
+        barElang.className = 'bar-fill up';
+        handleMistake("Jika makanan Elang (Burung Pipit) hilang, apakah Elang bisa bertahan hidup?", "Elang kekurangan makanan sehingga populasi Elang akan TURUN.");
+    }
+}
+
+/* ==========================================================================
+   12. TIM LABA-LABA (SIAP) MISSIONS
+   ========================================================================== */
+function renderLabaMissions(container) {
+    if (currentMissionIdx === 0) {
+        document.getElementById('game-mission-title').innerText = "Misi 1: Rantai Makanan 4 Kartu (+ Pengecoh)";
+        const shuffled = [ORGANISMS.padi, ORGANISMS.belalang, ORGANISMS.pipit, ORGANISMS.elang, ORGANISMS.air, ORGANISMS.matahari].sort(() => Math.random() - 0.5);
+
+        container.innerHTML = `
+            <p style="font-size: clamp(14px, 2vh, 19px); margin-bottom: 0.8vh; font-weight:800;">Pilih 4 kartu yang benar dan hiraukan pengecoh!</p>
+            <div class="chain-container">
+                <div class="drop-slot" data-expected="padi"><span class="slot-label">Produsen</span></div>
+                <div class="arrow-connector"><span class="arrow-icon">➡️</span></div>
+                <div class="drop-slot" data-expected="belalang"><span class="slot-label">Konsumen I</span></div>
+                <div class="arrow-connector"><span class="arrow-icon">➡️</span></div>
+                <div class="drop-slot" data-expected="pipit"><span class="slot-label">Konsumen II</span></div>
+                <div class="arrow-connector"><span class="arrow-icon">➡️</span></div>
+                <div class="drop-slot" data-expected="elang"><span class="slot-label">Konsumen III</span></div>
+            </div>
+            <div class="cards-pool" id="pool"></div>
+            <button class="btn btn-primary" style="margin-top:1.2vh;" onclick="checkChain4()">Cek Jawaban ✔️</button>
+        `;
+        renderPoolCards(shuffled);
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 1) {
+        document.getElementById('game-mission-title').innerText = "Misi 2: Klasifikasi Ekosistem Sawah";
+        container.innerHTML = `
+            <p style="font-size: clamp(14px, 2vh, 19px); margin-bottom: 0.8vh; font-weight:800;">Pilah 4 komponen berikut ke dalam kelompoknya!</p>
+            <div class="baskets-container">
+                <div class="basket biotic" data-basket="biotic">
+                    <div class="basket-title">🌱 BIOTIK</div>
+                    <div class="basket-content" id="b-biotic"></div>
+                </div>
+                <div class="basket abiotic" data-basket="abiotic">
+                    <div class="basket-title">🪨 ABIOTIK</div>
+                    <div class="basket-content" id="b-abiotic"></div>
+                </div>
+            </div>
+            <div class="cards-pool" id="pool"></div>
+            
+            <div class="reason-selector">
+                <div style="font-size: clamp(13px, 1.8vh, 17px); font-weight: 800;">Manakah alasan ilmiah yang paling tepat?</div>
+                <div class="reason-options">
+                    <button class="reason-btn" onclick="selectReason(this, true)">A. Air dan Sinar Matahari adalah Abiotik karena bukan makhluk hidup.</button>
+                    <button class="reason-btn" onclick="selectReason(this, false)">B. Belalang adalah Abiotik karena berukuran sangat kecil.</button>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:0.8vh;" onclick="checkBiotikLaba()">Cek Jawaban ✔️</button>
+        `;
+        renderPoolCards([ORGANISMS.padi, ORGANISMS.belalang, ORGANISMS.air, ORGANISMS.matahari]);
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 2) {
+        document.getElementById('game-mission-title').innerText = "Misi 3: Peran Rantai Makanan 4 Tingkat";
+        container.innerHTML = `
+            <div style="display:flex; gap:clamp(8px, 1.5vw, 16px); margin-bottom:1.2vh;">
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.padi)}
+                    <div class="drop-slot" data-expected="Produsen" style="width:clamp(90px, 9.5vw, 115px); height:clamp(40px, 5.5vh, 48px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.belalang)}
+                    <div class="drop-slot" data-expected="Konsumen I" style="width:clamp(90px, 9.5vw, 115px); height:clamp(40px, 5.5vh, 48px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.pipit)}
+                    <div class="drop-slot" data-expected="Konsumen II" style="width:clamp(90px, 9.5vw, 115px); height:clamp(40px, 5.5vh, 48px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.elang)}
+                    <div class="drop-slot" data-expected="Konsumen III" style="width:clamp(90px, 9.5vw, 115px); height:clamp(40px, 5.5vh, 48px);"><span class="slot-label">Peran</span></div>
+                </div>
+            </div>
+            <div class="cards-pool" id="pool">
+                <div class="role-badge" draggable="true" data-id="Produsen">Produsen</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen I">Konsumen I</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen II">Konsumen II</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen III">Konsumen III</div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:1.2vh;" onclick="checkRolesLaba()">Cek Jawaban ✔️</button>
+        `;
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 3) {
+        document.getElementById('game-mission-title').innerText = "Misi 4: Simulasi Perubahan Ekosistem";
+        container.innerHTML = `
+            <div class="simulation-box">
+                <div style="text-align:center; max-width:300px;">
+                    <div style="font-size: clamp(32px, 5vh, 46px);">🦗 ❌</div>
+                    <h3 style="font-size: clamp(16px, 2.2vh, 20px); color: var(--danger);">Hama Belalang Dibasmi Total!</h3>
+                    <p style="font-size: clamp(13px, 1.8vh, 16px); margin-top: 4px;">Pilih prediksi populasi <strong>Burung Pipit 🐦</strong>:</p>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-bar-group">
+                        <div class="bar-wrapper"><div class="bar-fill" id="bar-pipit"></div></div>
+                        <span style="font-size: clamp(13px, 1.8vh, 16px); font-weight:800;">Pipit 🐦</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn btn-primary" onclick="runLabaSim('up')">📈 Pipit Bertambah</button>
+                    <button class="btn btn-primary" onclick="runLabaSim('down')">📉 Pipit Berkurang</button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function checkChain4() {
+    const slots = document.querySelectorAll('.drop-slot');
+    let correct = true;
+    slots.forEach(slot => {
+        const card = slot.querySelector('.organism-card');
+        if (!card || card.dataset.id !== slot.dataset.expected) correct = false;
+    });
+
+    if (correct) triggerMissionSuccess();
+    else handleMistake("Ingat! Air & Sinar matahari adalah abiotik, jangan dimasukkan ke rantai makanan.", "Urutan: Padi 🌾 → Belalang 🦗 → Burung Pipit 🐦 → Elang 🦅.");
+}
+
+function checkBiotikLaba() {
+    const bBiotik = document.getElementById('b-biotic');
+    const bAbiotik = document.getElementById('b-abiotic');
+    const bioCards = bBiotik.querySelectorAll('.organism-card');
+    const abioCards = bAbiotik.querySelectorAll('.organism-card');
+    const selectedReason = document.querySelector('.reason-btn.selected');
+
+    if (bioCards.length === 2 && abioCards.length === 2 && selectedReason && selectedReason.dataset.correct === "true") triggerMissionSuccess();
+    else handleMistake("Pastikan Padi & Belalang ada di Biotik, Air & Matahari di Abiotik.", "Pilih alasan A yang menyatakan Air & Matahari adalah benda tak hidup.");
+}
+
+function checkRolesLaba() {
+    const slots = document.querySelectorAll('.drop-slot');
+    let correct = true;
+    slots.forEach(slot => {
+        const badge = slot.querySelector('.role-badge');
+        if (!badge || badge.dataset.id !== slot.dataset.expected) correct = false;
+    });
+
+    if (correct) triggerMissionSuccess();
+    else handleMistake("Mengapa padi disebut Produsen? Karena padi dapat memproduksi makanannya sendiri!", "Padi = Produsen, Belalang = Konsumen I, Pipit = Konsumen II, Elang = Konsumen III.");
+}
+
+function runLabaSim(choice) {
+    const bar = document.getElementById('bar-pipit');
+    if (choice === 'down') {
+        bar.style.height = '25%';
+        bar.className = 'bar-fill down';
+        setTimeout(() => triggerMissionSuccess(), 800);
+    } else {
+        bar.style.height = '85%';
+        bar.className = 'bar-fill up';
+        handleMistake("Jika Belalang (makanan Pipit) hilang, apakah makanan Pipit berkurang?", "Belalang berkurang membuat Burung Pipit kekurangan makanan sehingga populasinya BERKURANG.");
+    }
+}
+
+/* ==========================================================================
+   13. TIM ELANG (MAHIR) MISSIONS
+   ========================================================================== */
+function renderElangMissions(container) {
+    if (currentMissionIdx === 0) {
+        document.getElementById('game-mission-title').innerText = "Misi 1: Detektif Rantai Makanan (5 Kartu)";
+        const shuffled = [ORGANISMS.padi, ORGANISMS.belalang, ORGANISMS.laba, ORGANISMS.ular, ORGANISMS.elang, ORGANISMS.air].sort(() => Math.random() - 0.5);
+
+        container.innerHTML = `
+            <p style="font-size: clamp(13px, 1.8vh, 17px); margin-bottom: 0.6vh; font-weight:800;">Susun 5 organisme & perbaiki arah panah yang terbalik (klik tombol Ubah)!</p>
+            <div class="chain-container" style="gap:4px;">
+                <div class="drop-slot" data-expected="padi"><span class="slot-label">Produsen</span></div>
+                <div class="arrow-connector">
+                    <span class="arrow-icon" id="arr-0">⬅️</span>
+                    <button class="arrow-toggle-btn" onclick="toggleArrow(0)">Ubah 🔁</button>
+                </div>
+                <div class="drop-slot" data-expected="belalang"><span class="slot-label">Konsumen I</span></div>
+                <div class="arrow-connector">
+                    <span class="arrow-icon" id="arr-1">➡️</span>
+                    <button class="arrow-toggle-btn" onclick="toggleArrow(1)">Ubah 🔁</button>
+                </div>
+                <div class="drop-slot" data-expected="laba"><span class="slot-label">Konsumen II</span></div>
+                <div class="arrow-connector">
+                    <span class="arrow-icon" id="arr-2">⬅️</span>
+                    <button class="arrow-toggle-btn" onclick="toggleArrow(2)">Ubah 🔁</button>
+                </div>
+                <div class="drop-slot" data-expected="ular"><span class="slot-label">Konsumen III</span></div>
+                <div class="arrow-connector">
+                    <span class="arrow-icon" id="arr-3">➡️</span>
+                    <button class="arrow-toggle-btn" onclick="toggleArrow(3)">Ubah 🔁</button>
+                </div>
+                <div class="drop-slot" data-expected="elang"><span class="slot-label">Konsumen IV</span></div>
+            </div>
+            <div class="cards-pool" id="pool"></div>
+            <button class="btn btn-primary" style="margin-top:1vh;" onclick="checkChainElang()">Cek Analisis Detektif ✔️</button>
+        `;
+        renderPoolCards(shuffled);
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 1) {
+        document.getElementById('game-mission-title').innerText = "Misi 2: Klasifikasi 6 Komponen Ekosistem";
+        container.innerHTML = `
+            <p style="font-size: clamp(14px, 1.9vh, 18px); margin-bottom: 0.6vh; font-weight:800;">Pilah 6 komponen ekosistem ke keranjang yang sesuai!</p>
+            <div class="baskets-container">
+                <div class="basket biotic" data-basket="biotic">
+                    <div class="basket-title">🌱 BIOTIK</div>
+                    <div class="basket-content" id="b-biotic"></div>
+                </div>
+                <div class="basket abiotic" data-basket="abiotic">
+                    <div class="basket-title">🪨 ABIOTIK</div>
+                    <div class="basket-content" id="b-abiotic"></div>
+                </div>
+            </div>
+            <div class="cards-pool" id="pool"></div>
+            
+            <div class="reason-selector">
+                <div style="font-size: clamp(13px, 1.7vh, 16px); font-weight: 800;">Pilih penjelasan ilmiah terbaik:</div>
+                <div class="reason-options">
+                    <button class="reason-btn" onclick="selectReason(this, false)">A. Bakteri adalah abiotik karena tidak kasat mata.</button>
+                    <button class="reason-btn" onclick="selectReason(this, true)">B. Bakteri & Jamur adalah biotik karena merupakan pengurai (makhluk hidup).</button>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:0.8vh;" onclick="checkBiotikElang()">Cek Jawaban ✔️</button>
+        `;
+        renderPoolCards([ORGANISMS.padi, ORGANISMS.ular, ORGANISMS.bakteri, ORGANISMS.air, ORGANISMS.tanah, ORGANISMS.matahari]);
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 2) {
+        document.getElementById('game-mission-title').innerText = "Misi 3: Identifikasi Peran 5 Tingkat";
+        container.innerHTML = `
+            <div style="display:flex; gap:clamp(6px, 1.2vw, 12px); margin-bottom:1vh;">
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.padi)}
+                    <div class="drop-slot" data-expected="Produsen" style="width:clamp(85px, 9vw, 105px); height:clamp(38px, 5vh, 46px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.belalang)}
+                    <div class="drop-slot" data-expected="Konsumen I" style="width:clamp(85px, 9vw, 105px); height:clamp(38px, 5vh, 46px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.laba)}
+                    <div class="drop-slot" data-expected="Konsumen II" style="width:clamp(85px, 9vw, 105px); height:clamp(38px, 5vh, 46px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.ular)}
+                    <div class="drop-slot" data-expected="Konsumen III" style="width:clamp(85px, 9vw, 105px); height:clamp(38px, 5vh, 46px);"><span class="slot-label">Peran</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    ${createOrganismCardHtml(ORGANISMS.elang)}
+                    <div class="drop-slot" data-expected="Konsumen IV" style="width:clamp(85px, 9vw, 105px); height:clamp(38px, 5vh, 46px);"><span class="slot-label">Peran</span></div>
+                </div>
+            </div>
+            <div class="cards-pool" id="pool">
+                <div class="role-badge" draggable="true" data-id="Produsen">Produsen</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen I">Konsumen I</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen II">Konsumen II</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen III">Konsumen III</div>
+                <div class="role-badge" draggable="true" data-id="Konsumen IV">Konsumen IV</div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:1vh;" onclick="checkRolesElang()">Cek Jawaban ✔️</button>
+        `;
+        initDragAndDrop();
+    }
+    else if (currentMissionIdx === 3) {
+        document.getElementById('game-mission-title').innerText = "Misi 4: Analisis Dampak Berantai (Multi-Faktor)";
+        container.innerHTML = `
+            <div style="background:#FFF; padding:18px; border-radius:24px; border:4px solid var(--gold-dark); width:100%; max-width:850px; text-align:center;">
+                <h3 style="font-size:clamp(18px, 2.5vh, 23px); color:var(--danger); margin-bottom:8px;">🕷️ Jika Populasi Laba-laba Tiba-tiba Punah ❌</h3>
+                <p style="font-size:clamp(14px, 2vh, 18px); margin-bottom:14px;">Pilih <strong>DUA (2)</strong> dampak berantai yang pasti terjadi di sawah:</p>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; text-align:left; margin-bottom:16px;">
+                    <div class="checkbox-option" onclick="toggleMultiCheck(this)" data-key="belalang_up">
+                        <div class="custom-check">✓</div>
+                        <span>🦗 Populasi Belalang meningkat pesat</span>
+                    </div>
+                    <div class="checkbox-option" onclick="toggleMultiCheck(this)" data-key="padi_damage">
+                        <div class="custom-check">✓</div>
+                        <span>🌾 Padi banyak rusak dimakan belalang</span>
+                    </div>
+                    <div class="checkbox-option" onclick="toggleMultiCheck(this)" data-key="ular_happy">
+                        <div class="custom-check">✓</div>
+                        <span>🐍 Ular bertambah sangat banyak</span>
+                    </div>
+                    <div class="checkbox-option" onclick="toggleMultiCheck(this)" data-key="elang_sleep">
+                        <div class="custom-check">✓</div>
+                        <span>🦅 Elang berhenti berburu</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="checkMultiImpactElang()">Uji Analisis Dampak 🧪</button>
+            </div>
+        `;
+    }
+    else if (currentMissionIdx === 4) {
+        document.getElementById('game-mission-title').innerText = "Misi Bonus: Pahlawan Pengurai (Dekomposer)";
+        container.innerHTML = `
+            <div class="bonus-banner">
+                <span>🌟 BONUS EXPERT (TIDAK DINILAI)</span>
+                <h3>Pilah Organisme Pengurai (Dekomposer)</h3>
+            </div>
+            <div class="bonus-stage">
+                <div class="leaf-decay-box" id="decay-target">🍂</div>
+                <div style="flex:1; min-width:0;">
+                    <p>Geser 🍄 Jamur & 🧫 Bakteri ke Daun Busuk!</p>
+                    <div class="drop-slot" data-expected="pengurai">
+                        <span class="slot-label">Kotak Pengurai</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cards-pool" id="pool">
+                ${createOrganismCardHtml(ORGANISMS.jamur)}
+                ${createOrganismCardHtml(ORGANISMS.bakteri)}
+                ${createOrganismCardHtml(ORGANISMS.pipit)}
+            </div>
+            <button class="btn btn-success" onclick="checkBonusPengurai()">Selesaikan Bonus ✨</button>
+        `;
+        initDragAndDrop();
+    }
+}
+
+let arrowStates = ['⬅️', '➡️', '⬅️', '➡️'];
+function toggleArrow(idx) {
+    playClickSound();
+    const elem = document.getElementById(`arr-${idx}`);
+    if (arrowStates[idx] === '➡️') {
+        arrowStates[idx] = '⬅️';
+        elem.innerText = '⬅️';
+    } else {
+        arrowStates[idx] = '➡️';
+        elem.innerText = '➡️';
+    }
+}
+
+function checkChainElang() {
+    const slots = document.querySelectorAll('.drop-slot');
+    let correctCards = true;
+    slots.forEach(slot => {
+        const card = slot.querySelector('.organism-card');
+        if (!card || card.dataset.id !== slot.dataset.expected) correctCards = false;
+    });
+
+    const correctArrows = arrowStates.every(a => a === '➡️');
+
+    if (correctCards && correctArrows) triggerMissionSuccess();
+    else handleMistake("Perhatikan arah panah! Panah harus menunjuk dari yang dimakan ke yang memakan (➡️).", "Urutan: Padi ➡️ Belalang ➡️ Laba-laba ➡️ Ular ➡️ Elang.");
+}
+
+function checkBiotikElang() {
+    const bBiotik = document.getElementById('b-biotic').querySelectorAll('.organism-card');
+    const bAbiotik = document.getElementById('b-abiotic').querySelectorAll('.organism-card');
+    const selectedReason = document.querySelector('.reason-btn.selected');
+
+    if (bBiotik.length === 3 && bAbiotik.length === 3 && selectedReason && selectedReason.dataset.correct === "true") triggerMissionSuccess();
+    else handleMistake("Bakteri adalah makhluk hidup mikro (Biotik). Tanah & Air & Matahari adalah Abiotik.", "Pilih alasan B yang menjelaskan bahwa Bakteri & Jamur adalah pengurai hidup.");
+}
+
+function checkRolesElang() {
+    const slots = document.querySelectorAll('.drop-slot');
+    let correct = true;
+    slots.forEach(slot => {
+        const badge = slot.querySelector('.role-badge');
+        if (!badge || badge.dataset.id !== slot.dataset.expected) correct = false;
+    });
+
+    if (correct) triggerMissionSuccess();
+    else handleMistake("Perhatikan tingkatan konsumen dari Konsumen I sampai IV.", "Padi (Produsen), Belalang (K-I), Laba-laba (K-II), Ular (K-III), Elang (K-IV).");
+}
+
+function toggleMultiCheck(elem) {
+    playClickSound();
+    elem.classList.toggle('selected');
+}
+
+function checkMultiImpactElang() {
+    const selected = document.querySelectorAll('.checkbox-option.selected');
+    const keys = Array.from(selected).map(s => s.dataset.key);
+
+    if (keys.length === 2 && keys.includes('belalang_up') && keys.includes('padi_damage')) triggerMissionSuccess();
+    else handleMistake("Tanpa Laba-laba yang memakannya, apa yang terjadi pada populasi Belalang dan tanaman Padi?", "Pilih 'Populasi Belalang meningkat' & 'Padi banyak rusak'.");
+}
+
+function checkBonusPengurai() {
+    const slot = document.querySelector('.drop-slot[data-expected="pengurai"]');
+    const cards = slot.querySelectorAll('.organism-card');
+    const ids = Array.from(cards).map(c => c.dataset.id);
+
+    if (ids.includes('jamur') && ids.includes('bakteri') && !ids.includes('pipit')) {
+        const leaf = document.getElementById('decay-target');
+        leaf.innerText = '🌱✨';
+        leaf.classList.add('soil-rich');
+        soundFX.playSuccessFanfare();
+        setTimeout(() => triggerMissionSuccess(), 1000);
+    } else {
+        handleMistake("Pengurai terdiri dari Jamur dan Bakteri. Burung Pipit adalah Konsumen!", "Masukkan Jamur 🍄 dan Bakteri 🧫 ke dalam kotak pengurai.");
+    }
+}
+
+/* ==========================================================================
+   14. DUAL ENGINE (DRAG & DROP + TAP/CLICK SELECT)
+   ========================================================================== */
+function createOrganismCardHtml(org) {
+    return `
+        <div class="organism-card" draggable="true" data-id="${org.id}">
+            <span class="organism-emoji">${org.emoji}</span>
+            <span class="organism-name">${org.name}</span>
+        </div>
+    `;
+}
+
+function renderPoolCards(list) {
+    const pool = document.getElementById('pool');
+    pool.innerHTML = '';
+    list.forEach(org => {
+        pool.innerHTML += createOrganismCardHtml(org);
+    });
+}
+
+function selectReason(btn, isCorrect) {
+    playClickSound();
+    document.querySelectorAll('.reason-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.dataset.correct = "false";
+    });
+    btn.classList.add('selected');
+    btn.dataset.correct = isCorrect ? "true" : "false";
+}
+
+/* Geser dengan jari / mouse (Pointer Events) + ketuk untuk memilih lalu ketuk kotak */
+const DROP_ZONE_SELECTOR = '.drop-slot, .basket-content, #pool';
+let suppressClickUntil = 0;
+
+function findDropZone(x, y) {
+    const hit = document.elementFromPoint(x, y);
+    if (!hit) return null;
+    let zone = hit.closest(DROP_ZONE_SELECTOR);
+    if (!zone) {
+        const basket = hit.closest('.basket');
+        if (basket) zone = basket.querySelector('.basket-content');
+    }
+    if (!zone && hit.closest('.pane-right')) zone = document.getElementById('pool');
+    return zone;
+}
+
+/* Kotak rantai / peran hanya muat satu kartu: kartu lama dikembalikan ke kanan */
+function placeInto(zone, el) {
+    if (!zone || !el) return;
+    if (zone.classList.contains('drop-slot') && zone.dataset.expected !== 'pengurai') {
+        const old = zone.querySelector(':scope > .organism-card, :scope > .role-badge');
+        const pool = document.getElementById('pool');
+        if (old && old !== el && pool) pool.appendChild(old);
+    }
+    zone.appendChild(el);
+}
+
+function initDragAndDrop() {
+    const draggables = document.querySelectorAll('[draggable="true"]');
+    const dropSlots = document.querySelectorAll(DROP_ZONE_SELECTOR);
+
+    draggables.forEach(el => {
+        el.style.touchAction = 'none';
+        el.addEventListener('dragstart', e => e.preventDefault());
+
+        el.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            const label = el.querySelector('.organism-name');
+            Narrator.speak(label ? label.innerText : el.innerText.trim());
+            const rect = el.getBoundingClientRect();
+            const st = { startX: e.clientX, startY: e.clientY, left: rect.left, top: rect.top, w: rect.width, h: rect.height, ghost: null };
+            try { el.setPointerCapture(e.pointerId); } catch (err) {}
+
+            const onMove = (ev) => {
+                const dx = ev.clientX - st.startX, dy = ev.clientY - st.startY;
+                if (!st.ghost) {
+                    if (Math.hypot(dx, dy) < 8) return;
+                    st.ghost = el.cloneNode(true);
+                    st.ghost.classList.add('drag-ghost');
+                    st.ghost.classList.remove('selected');
+                    st.ghost.style.cssText = `position:fixed; left:${st.left}px; top:${st.top}px; width:${st.w}px; height:${st.h}px; margin:0; z-index:2000; pointer-events:none; touch-action:none;`;
+                    document.body.appendChild(st.ghost);
+                    el.classList.add('drag-origin');
+                    if (selectedCard) { selectedCard.classList.remove('selected'); selectedCard = null; }
+                }
+                st.ghost.style.left = (st.left + dx) + 'px';
+                st.ghost.style.top = (st.top + dy) + 'px';
+                document.querySelectorAll('.hovered').forEach(h => h.classList.remove('hovered'));
+                const zone = findDropZone(ev.clientX, ev.clientY);
+                if (zone && zone.id !== 'pool') zone.classList.add('hovered');
+                ev.preventDefault();
+            };
+
+            const onEnd = (ev) => {
+                el.removeEventListener('pointermove', onMove);
+                el.removeEventListener('pointerup', onEnd);
+                el.removeEventListener('pointercancel', onEnd);
+                try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+                document.querySelectorAll('.hovered').forEach(h => h.classList.remove('hovered'));
+                if (!st.ghost) return;            // hanya ketukan biasa
+                st.ghost.remove();
+                el.classList.remove('drag-origin');
+                suppressClickUntil = Date.now() + 350;
+                if (ev.type === 'pointercancel') return;
+                const zone = findDropZone(ev.clientX, ev.clientY);
+                if (zone) { placeInto(zone, el); playClickSound(); }
+            };
+
+            el.addEventListener('pointermove', onMove);
+            el.addEventListener('pointerup', onEnd);
+            el.addEventListener('pointercancel', onEnd);
+        });
+
+        el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (Date.now() < suppressClickUntil) return;
+            playClickSound();
+            if (selectedCard === el) {
+                el.classList.remove('selected');
+                selectedCard = null;
+            } else {
+                if (selectedCard) selectedCard.classList.remove('selected');
+                selectedCard = el;
+                el.classList.add('selected');
+            }
+        });
+    });
+
+    dropSlots.forEach(slot => {
+        slot.addEventListener('click', () => {
+            if (Date.now() < suppressClickUntil) return;
+            if (selectedCard) {
+                const card = selectedCard;
+                card.classList.remove('selected');
+                selectedCard = null;
+                placeInto(slot, card);
+                playClickSound();
+            }
+        });
+    });
+}
+
+/* ==========================================================================
+   15. RESULTS SUMMARY
+   ========================================================================== */
+function renderFinalResults() {
+    const team = GAME_DATA[currentTeam];
+    document.getElementById('result-team-name').innerText = `${team.icon} ${team.name} (${team.level})`;
+
+    const listContainer = document.getElementById('result-stars-list');
+    listContainer.innerHTML = '';
+    
+    let total = 0;
+    team.stars.forEach((starCount, idx) => {
+        total += starCount;
+        const item = document.createElement('div');
+        item.style.margin = '6px 0';
+        item.innerHTML = `<strong>Misi ${idx + 1}:</strong> ${'⭐'.repeat(starCount)} (${starCount}/3 Bintang)`;
+        listContainer.appendChild(item);
+    });
+
+    const maxPossible = team.missionsCount * 3;
+    document.getElementById('result-total-stars').innerText = `${total} / ${maxPossible} ⭐`;
+}
+
+window.onload = function() {
+    updateTeamSelectionUI();
+};
+</script>
+</body>
+</html>
