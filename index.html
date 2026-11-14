@@ -980,7 +980,30 @@
         .drag-origin { opacity: 0.3; }
         .drag-ghost { transform: scale(1.1) rotate(-3deg); box-shadow: 0 14px 28px rgba(0,0,0,0.4) !important; opacity: 0.95; cursor: grabbing; }
         .drop-slot.hovered, .basket-content.hovered { background: rgba(123, 192, 67, 0.3); outline: 4px dashed var(--padi-green); outline-offset: -4px; border-radius: 18px; }
-    </style>
+    
+        /* ===== MENU OPSI (GULIR KE BAWAH) ===== */
+        .nav-controls { position: relative; display: block; }
+        .nav-toggle { display: inline-flex; align-items: center; gap: 6px; }
+        .nav-caret { display: inline-block; transition: transform .2s; }
+        .nav-controls.open .nav-caret { transform: rotate(180deg); }
+        .nav-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            z-index: 100;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 190px;
+            padding: 10px;
+            background: #FFFFFF;
+            border: 3px solid var(--padi-dark);
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+        .nav-controls.open .nav-panel { display: flex; }
+        .nav-panel .btn-icon { width: 100%; justify-content: flex-start; text-align: left; white-space: nowrap; }
+</style>
 </head>
 <body>
 
@@ -1014,12 +1037,15 @@
         <div class="app-title-sm">
             🌾 Misi Rantai Makanan Sawah
         </div>
-        <div class="nav-controls">
+        <div class="nav-controls" id="nav-controls">
+            <button class="btn btn-icon nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-panel" onclick="toggleNavMenu(event)">☰ Opsi <span class="nav-caret">▾</span></button>
+            <div class="nav-panel" id="nav-panel">
             <button class="btn btn-icon" id="btn-home" style="display:none;" onclick="showScreen('screen-select-team')">🏠 Menu</button>
             <button class="btn btn-icon" id="btn-reset" style="display:none;" onclick="restartCurrentMission()">🔄 Ulangi</button>
             <button class="btn btn-icon" id="btn-read" style="display:none;" onclick="playClickSound(); narrateMission()">🔈 Bacakan</button>
             <button class="btn btn-icon" id="btn-voice" onclick="toggleNarrator()">🗣️ Narator</button>
             <button class="btn btn-icon" id="btn-audio" onclick="toggleAudio()">🔊 Suara</button>
+            </div>
         </div>
     </header>
 
@@ -1081,8 +1107,8 @@
 
                 <div class="team-card laba" onclick="selectTeam('laba')">
                     <div id="badge-laba" class="completion-badge" style="display:none;">✓</div>
-                    <div class="team-emoji">🕷️</div>
-                    <div class="team-name" style="color: var(--gold-dark);">Tim Laba-laba</div>
+                    <div class="team-emoji">🐸</div>
+                    <div class="team-name" style="color: var(--gold-dark);">Tim Katak</div>
                     <div class="level-badge">Tingkat: Siap</div>
                     <div class="stars-summary" id="stars-laba">⭐⭐⭐ (0/12)</div>
                 </div>
@@ -1298,13 +1324,13 @@ function toggleNarrator() {
     const btn = document.getElementById('btn-voice');
     btn.innerHTML = Narrator.enabled ? '🗣️ Narator' : '🤐 Narator Mati';
     if (!Narrator.enabled) Narrator.stop();
-    else { playClickSound(); Narrator.speak('Narator hidup.'); }
+    else { playClickSound(); }
 }
 
 const SCREEN_NARRATION = {
     'screen-welcome': 'Halo, teman-teman! Pak Tani butuh bantuan Tim Penjaga Sawah! Rantai makanan di ekosistem sawah sedang terganggu. Yuk, bantu menyusun dan menyeimbangkan kembali ekosistem sawah! Tekan tombol Mulai Petualangan.',
     'screen-howto': 'Cara bermain. Satu: geser kartu dengan jarimu, atau ketuk kartu lalu ketuk kotak yang tersedia. Dua: perhatikan arah panah. Panah berarti, dimakan oleh. Tiga: selesaikan misi dengan teliti untuk mendapatkan tiga bintang emas. Tekan Lanjut untuk memilih kelompok.',
-    'screen-select-team': 'Pilih kelompok belajarmu! Tim Pipit untuk tingkat berkembang. Tim Laba-laba untuk tingkat siap. Tim Elang untuk tingkat mahir.'
+    'screen-select-team': 'Pilih kelompok belajarmu! Tim Pipit untuk tingkat berkembang. Tim Katak untuk tingkat siap. Tim Elang untuk tingkat mahir.'
 };
 
 function narrateScreen(screenId) {
@@ -1353,7 +1379,7 @@ function narrateMission() {
    ========================================================================== */
 const GAME_DATA = {
     pipit: { name: 'Tim Pipit', icon: '🐦', level: 'Berkembang', missionsCount: 4, completed: false, stars: [0, 0, 0, 0] },
-    laba: { name: 'Tim Laba-laba', icon: '🕷️', level: 'Siap', missionsCount: 4, completed: false, stars: [0, 0, 0, 0] },
+    laba: { name: 'Tim Katak', icon: '🐸', level: 'Siap', missionsCount: 4, completed: false, stars: [0, 0, 0, 0] },
     elang: { name: 'Tim Elang', icon: '🦅', level: 'Mahir', missionsCount: 5, completed: false, stars: [0, 0, 0, 0, 0] }
 };
 
@@ -1366,7 +1392,7 @@ const ORGANISMS = {
     padi: { id: 'padi', name: 'Padi', emoji: '🌾', type: 'biotic', role: 'Produsen' },
     belalang: { id: 'belalang', name: 'Belalang', emoji: '🦗', type: 'biotic', role: 'Konsumen I' },
     pipit: { id: 'pipit', name: 'Burung Pipit', emoji: '🐦', type: 'biotic', role: 'Konsumen I' },
-    laba: { id: 'laba', name: 'Laba-laba', emoji: '🕷️', type: 'biotic', role: 'Konsumen II' },
+    katak: { id: 'katak', name: 'Katak', emoji: '🐸', type: 'biotic', role: 'Konsumen II' },
     ular: { id: 'ular', name: 'Ular', emoji: '🐍', type: 'biotic', role: 'Konsumen III' },
     elang: { id: 'elang', name: 'Elang', emoji: '🦅', type: 'biotic', role: 'Konsumen II' },
     jamur: { id: 'jamur', name: 'Jamur', emoji: '🍄', type: 'biotic', role: 'Pengurai' },
@@ -1388,7 +1414,6 @@ function showScreen(screenId) {
     document.getElementById('btn-reset').style.display = isGame ? 'inline-flex' : 'none';
     document.getElementById('btn-read').style.display = (isGame && Narrator.supported) ? 'inline-flex' : 'none';
 
-    if (!isGame) narrateScreen(screenId);
 }
 
 function selectTeam(teamKey) {
@@ -1438,7 +1463,6 @@ function startMission() {
     else if (currentTeam === 'elang') renderElangMissions(container);
 
     arrangeSplit(container);
-    narrateMission();
 }
 
 /* Susun layout kiri (soal) dan kanan (kartu + tombol) */
@@ -1891,7 +1915,7 @@ function runLabaSim(choice) {
 function renderElangMissions(container) {
     if (currentMissionIdx === 0) {
         document.getElementById('game-mission-title').innerText = "Misi 1: Detektif Rantai Makanan (5 Kartu)";
-        const shuffled = [ORGANISMS.padi, ORGANISMS.belalang, ORGANISMS.laba, ORGANISMS.ular, ORGANISMS.elang, ORGANISMS.air].sort(() => Math.random() - 0.5);
+        const shuffled = [ORGANISMS.padi, ORGANISMS.belalang, ORGANISMS.katak, ORGANISMS.ular, ORGANISMS.elang, ORGANISMS.air].sort(() => Math.random() - 0.5);
 
         container.innerHTML = `
             <p style="font-size: clamp(13px, 1.8vh, 17px); margin-bottom: 0.6vh; font-weight:800;">Susun 5 organisme & perbaiki arah panah yang terbalik (klik tombol Ubah)!</p>
@@ -1906,7 +1930,7 @@ function renderElangMissions(container) {
                     <span class="arrow-icon" id="arr-1">➡️</span>
                     <button class="arrow-toggle-btn" onclick="toggleArrow(1)">Ubah 🔁</button>
                 </div>
-                <div class="drop-slot" data-expected="laba"><span class="slot-label">Konsumen II</span></div>
+                <div class="drop-slot" data-expected="katak"><span class="slot-label">Konsumen II</span></div>
                 <div class="arrow-connector">
                     <span class="arrow-icon" id="arr-2">⬅️</span>
                     <button class="arrow-toggle-btn" onclick="toggleArrow(2)">Ubah 🔁</button>
@@ -1965,7 +1989,7 @@ function renderElangMissions(container) {
                     <div class="drop-slot" data-expected="Konsumen I" style="width:clamp(85px, 9vw, 105px); height:clamp(38px, 5vh, 46px);"><span class="slot-label">Peran</span></div>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:center;">
-                    ${createOrganismCardHtml(ORGANISMS.laba)}
+                    ${createOrganismCardHtml(ORGANISMS.katak)}
                     <div class="drop-slot" data-expected="Konsumen II" style="width:clamp(85px, 9vw, 105px); height:clamp(38px, 5vh, 46px);"><span class="slot-label">Peran</span></div>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:center;">
@@ -1992,7 +2016,7 @@ function renderElangMissions(container) {
         document.getElementById('game-mission-title').innerText = "Misi 4: Analisis Dampak Berantai (Multi-Faktor)";
         container.innerHTML = `
             <div style="background:#FFF; padding:18px; border-radius:24px; border:4px solid var(--gold-dark); width:100%; max-width:850px; text-align:center;">
-                <h3 style="font-size:clamp(18px, 2.5vh, 23px); color:var(--danger); margin-bottom:8px;">🕷️ Jika Populasi Laba-laba Tiba-tiba Punah ❌</h3>
+                <h3 style="font-size:clamp(18px, 2.5vh, 23px); color:var(--danger); margin-bottom:8px;">🐸 Jika Populasi Katak Tiba-tiba Punah ❌</h3>
                 <p style="font-size:clamp(14px, 2vh, 18px); margin-bottom:14px;">Pilih <strong>DUA (2)</strong> dampak berantai yang pasti terjadi di sawah:</p>
                 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; text-align:left; margin-bottom:16px;">
@@ -2069,7 +2093,7 @@ function checkChainElang() {
     const correctArrows = arrowStates.every(a => a === '➡️');
 
     if (correctCards && correctArrows) triggerMissionSuccess();
-    else handleMistake("Perhatikan arah panah! Panah harus menunjuk dari yang dimakan ke yang memakan (➡️).", "Urutan: Padi ➡️ Belalang ➡️ Laba-laba ➡️ Ular ➡️ Elang.");
+    else handleMistake("Perhatikan arah panah! Panah harus menunjuk dari yang dimakan ke yang memakan (➡️).", "Urutan: Padi ➡️ Belalang ➡️ Katak ➡️ Ular ➡️ Elang.");
 }
 
 function checkBiotikElang() {
@@ -2090,7 +2114,7 @@ function checkRolesElang() {
     });
 
     if (correct) triggerMissionSuccess();
-    else handleMistake("Perhatikan tingkatan konsumen dari Konsumen I sampai IV.", "Padi (Produsen), Belalang (K-I), Laba-laba (K-II), Ular (K-III), Elang (K-IV).");
+    else handleMistake("Perhatikan tingkatan konsumen dari Konsumen I sampai IV.", "Padi (Produsen), Belalang (K-I), Katak (K-II), Ular (K-III), Elang (K-IV).");
 }
 
 function toggleMultiCheck(elem) {
@@ -2103,7 +2127,7 @@ function checkMultiImpactElang() {
     const keys = Array.from(selected).map(s => s.dataset.key);
 
     if (keys.length === 2 && keys.includes('belalang_up') && keys.includes('padi_damage')) triggerMissionSuccess();
-    else handleMistake("Tanpa Laba-laba yang memakannya, apa yang terjadi pada populasi Belalang dan tanaman Padi?", "Pilih 'Populasi Belalang meningkat' & 'Padi banyak rusak'.");
+    else handleMistake("Tanpa Katak yang memakannya, apa yang terjadi pada populasi Belalang dan tanaman Padi?", "Pilih 'Populasi Belalang meningkat' & 'Padi banyak rusak'.");
 }
 
 function checkBonusPengurai() {
@@ -2189,8 +2213,6 @@ function initDragAndDrop() {
 
         el.addEventListener('pointerdown', (e) => {
             if (e.pointerType === 'mouse' && e.button !== 0) return;
-            const label = el.querySelector('.organism-name');
-            Narrator.speak(label ? label.innerText : el.innerText.trim());
             const rect = el.getBoundingClientRect();
             const st = { startX: e.clientX, startY: e.clientY, left: rect.left, top: rect.top, w: rect.width, h: rect.height, ghost: null };
             try { el.setPointerCapture(e.pointerId); } catch (err) {}
@@ -2290,6 +2312,29 @@ function renderFinalResults() {
 window.onload = function() {
     updateTeamSelectionUI();
 };
+
+/* Menu Opsi (dropdown) */
+function toggleNavMenu(e) {
+    if (e) e.stopPropagation();
+    const box = document.getElementById('nav-controls');
+    const open = box.classList.toggle('open');
+    document.getElementById('nav-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeNavMenu() {
+    const box = document.getElementById('nav-controls');
+    if (!box) return;
+    box.classList.remove('open');
+    document.getElementById('nav-toggle').setAttribute('aria-expanded', 'false');
+}
+document.addEventListener('click', (e) => {
+    const box = document.getElementById('nav-controls');
+    if (!box || !box.classList.contains('open')) return;
+    const btn = e.target.closest('.nav-panel .btn');
+    // tetap terbuka saat mengubah Narator/Suara; tutup untuk tombol lain & klik di luar
+    if (btn && (btn.id === 'btn-voice' || btn.id === 'btn-audio')) return;
+    if (!btn && box.contains(e.target)) return;
+    closeNavMenu();
+});
 </script>
 </body>
 </html>
